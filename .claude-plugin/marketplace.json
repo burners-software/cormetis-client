@@ -1,0 +1,15 @@
+{
+  "name": "cor-metis-client",
+  "owner": {
+    "name": "COR.energy",
+    "url": "https://cor.energy"
+  },
+  "plugins": [
+    {
+      "name": "cor-metis",
+      "version": "0.1.0",
+      "description": "COR.metis — Wissens-Orakel, Anlagen-Livestatus und Dokumenten-Ingest für COR Energy",
+      "source": "./plugins/cor-metis"
+    }
+  ]
+}
