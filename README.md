@@ -87,8 +87,9 @@ verlustfrei.
 
 Aus der Deployment-Spec, Abschnitt 7 — serverseitig, blockierend:
 
-- [ ] **`apikey` aus den Query-Logs maskieren.** Der Key steht in der URL und landet damit in
-      Access-Logs, Proxy-Logs und Error-Traces.
+- [x] **`apikey` aus den Query-Logs.** Erledigt (Felix, 2026-08-12) — nginx protokolliert Query-Parameter
+      gar nicht mehr, statt nur `apikey` zu maskieren. Offen bleibt: Error-Tracing/APM hängt die volle
+      URL gern an den Trace.
 - [ ] **Keys URL-safe erzeugen** (base64url oder Hex) — `+`, `/`, `=` zerlegen den Query-String.
 - [ ] **Keys pro Person, widerrufbar.** Ein geteilter Key hebelt das Clearance-Modell aus.
 - [ ] **MCP-Endpoint-Pfad bestätigen.** `/esks/mcp` ist aus `/esks/health` abgeleitet, nicht verifiziert.

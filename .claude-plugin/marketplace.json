@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "cor-metis",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "description": "COR.metis — Wissens-Orakel, Anlagen-Livestatus und Dokumenten-Ingest für COR Energy",
       "source": "./plugins/cor-metis"
     }

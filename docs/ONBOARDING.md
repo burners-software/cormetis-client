@@ -12,18 +12,38 @@ Link zur Quelle. Nicht aus dem Internet, nicht geraten.
 ## Was du brauchst
 
 - **Claude Desktop** (die App, nicht die Website — Plugins laufen nur in der App).
-- **Deinen persönlichen ESKS-API-Key.** Den bekommst du von Chris.
+- **Deinen persönlichen ESKS-API-Key.** Den legt Chris für dich an; du bekommst ihn als
+  Vaultwarden-Link. Er muss nicht schon da sein, wenn du anfängst — Schritt 1 geht auch ohne.
 
 > **Zum Key:** Er ist dein Ausweis. Was du in COR.metis zu sehen bekommst, hängt an ihm — deshalb
 > hat jeder seinen eigenen, und deshalb wird keiner weitergegeben. Auch nicht kurz, auch nicht an
 > Kollegen. Und: **niemals in einen Chat tippen**, weder bei Claude noch woanders. Er gehört in genau
-> ein Feld, und das kommt gleich in Schritt 1.
+> ein Feld, und das kommt in Schritt 2.
+
+*ESKS steht für „Expert System Knowledge Service" — der Dienst, der die Daten bereitstellt.*
 
 ---
 
-## Schritt 1 — Zugang zur Knowledgebase herstellen
+## Schritt 1 — COR.metis installieren
 
-1. In Claude Desktop: **Einstellungen → Konnektoren.**
+1. In Claude Desktop: **Einstellungen → Plugins.**
+2. Button **„Hinzufügen"** → **„Marketplace hinzufügen"** → **„Aus einem Repository hinzufügen"**.
+3. Dort diese URL eintragen:
+
+   ```
+   https://github.com/burners-software/cormetis-client
+   ```
+
+4. Jetzt erscheint der Marketplace mit einem Eintrag. In der Übersicht heißt er **„Cor metis"** —
+   das ist das Richtige, auch wenn im Repo überall `cor-metis` steht. **Hinzufügen.**
+
+---
+
+## Schritt 2 — Zugang zur Knowledgebase herstellen
+
+Das ist der einzige Schritt, der etwas Sorgfalt braucht. Danach nie wieder.
+
+1. **Einstellungen → Konnektoren.**
 2. **„Connector hinzufügen" → „Benutzerdefinierter Connector".**
 3. **Name:** `ESKS`
 
@@ -31,29 +51,19 @@ Link zur Quelle. Nicht aus dem Internet, nicht geraten.
    > die Adresse, unter der COR.metis den Zugang später sucht — stimmt er nicht, ist alles verbunden
    > und trotzdem funktioniert nichts. Das ist mit Abstand der häufigste Stolperstein.
 
-4. **URL:** deine Basis-URL mit angehängtem Key:
+4. **URL:** die Basis-URL mit angehängtem Key:
 
    ```
    https://internal.cor.energy/esks/mcp?apikey=DEIN_KEY
    ```
 
-   `DEIN_KEY` ersetzt du durch deinen eigenen Key. Achte darauf, dass beim Kopieren kein Leerzeichen
-   und kein Zeilenumbruch mitkommt.
+   `DEIN_KEY` ersetzt du durch deinen eigenen Key aus dem Vaultwarden-Link. Achte darauf, dass beim
+   Kopieren kein Leerzeichen und kein Zeilenumbruch mitkommt.
+
+   > Dass der Key in der URL steht, ist unschön und uns bekannt. Sobald Claude Desktop die nötige
+   > Funktion mitbringt, wandert der Zugang ins Plugin und dieser Schritt entfällt ersatzlos.
 
 5. **Speichern.**
-
----
-
-## Schritt 2 — COR.metis installieren
-
-1. **Einstellungen → Plugins** (unter „Anpassen").
-2. **„Marketplace hinzufügen"**, dort eintragen:
-
-   ```
-   burners-software/cormetis-client
-   ```
-
-3. Im Marketplace das Plugin **`cor-metis`** auswählen und **installieren**.
 
 ---
 
@@ -71,12 +81,20 @@ und falls nicht, woran es liegt.
 
 ## Und jetzt?
 
-Einfach fragen. Beispiele:
+Einfach fragen. Kein Kommando, kein Menü — die passenden Fähigkeiten schalten sich selbst dazu.
 
-- „Welche Modbus-Register hat die COR.gen TwinPower für die Energiezählung?"
+**Fang mit diesen beiden an.** Sie zeigen am schnellsten, worum es geht:
+
+- „Was macht die Anlage <Seriennummer> gerade?" — der Live-Zustand einer echten COR.gen: was sie
+  fährt, welche Störungen anliegen, warum sie steht. *(braucht interne Freigabe)*
+- „Welche Modbus-Register hat die COR.gen TwinPower für die Energiezählung?" — und dann schau nach,
+  ob die Registernummern stimmen. Genau das ist der Punkt.
+
+Danach alles andere:
+
 - „Wo schließe ich die Pumpe an?"
 - „Was bedeutet Fehlercode 17 in der Heizungssteuerung?"
-- „Was macht die Anlage cor-xc001 gerade?" *(braucht interne Freigabe)*
+- „Welche Zertifizierungen hat die COR.stor?"
 - „Schreib mir eine Mail an einen Kunden über die Leistungsdaten der COR.gen."
 
 Beim letzten Beispiel wird Claude einmal nachfragen, wer der Empfänger ist. Das ist Absicht: für
@@ -146,6 +164,7 @@ welcher Stelle es hakt. Zur Einordnung:
 | Zeitüberschreitung, „Server nicht erreichbar" | Du bist nicht im Firmennetz / nicht im VPN |
 | „Dein Zugang hat keine interne Freigabe" | Kein Fehler. Anlagen-Livedaten sind intern; die Dokumentensuche funktioniert weiter |
 | Ingest bricht beim Bild-Upload ab | Die drei Schalter oben — und danach eine **neue** Session |
+| Ich finde das Plugin im Marketplace nicht | In der Übersicht heißt es **„Cor metis"**, nicht `cor-metis` |
 
 Hilft das nicht weiter: bei Chris melden, am besten mit der wörtlichen Fehlermeldung.
 
