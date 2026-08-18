@@ -1,6 +1,6 @@
 ---
 name: "burner-status"
-description: "Live-Status einer konkreten CORgen-Anlage. Nutze diesen Skill, wenn jemand wissen will, wie es einer Anlage geht, was sie gerade fährt, ob Störungen anliegen oder warum sie steht — egal ob er eine Seriennummer nennt, sie schludrig schreibt oder die Anlage nur umschreibt (\"der Kessel in der Technikhalle\"). Erklärt, wie man von einer unscharfen Angabe über `find_burner` zur Seriennummer kommt und wie die Antwort von `get_burner_status` zu lesen ist — vor allem, was sie NICHT hergibt. Abgrenzung: Fragen zur Dokumentation, zu Datenblättern, Modbus-Registern oder zur Bedeutung eines Fehlercodes im Allgemeinen gehören in den Skill orakel — dieser Skill liest nur den Momentzustand einer einzelnen Maschine. Greift auf den ESKS-MCP-Server zu und ist auf interne Clearance (C2) beschränkt."
+description: "Live-Status einer konkreten CORgen-Anlage. \"Burner\", \"Brenner\", \"COR.gen\", \"cor.gen\" und \"corgen\" meinen dasselbe Gerät. Nutze diesen Skill, wenn jemand wissen will, wie es einer Anlage geht, was sie gerade fährt, ob Störungen anliegen oder warum sie steht — egal ob er eine Seriennummer nennt, sie schludrig schreibt, nur den internen Namen kennt (\"chriseins\") oder die Anlage bloß umschreibt (\"der Kessel in der Technikhalle\"). Erklärt, wie man von einer unscharfen Angabe über `find_burner` zur Seriennummer kommt und wie die Antwort von `get_burner_status` zu lesen ist — vor allem, was sie NICHT hergibt. Abgrenzung: Fragen zur Dokumentation, zu Datenblättern, Modbus-Registern oder zur Bedeutung eines Fehlercodes im Allgemeinen gehören in den Skill orakel — dieser Skill liest nur den Momentzustand einer einzelnen Maschine. Greift auf den ESKS-MCP-Server zu und ist auf interne Clearance (C2) beschränkt."
 ---
 
 # COR.metis Burner-Status — Live-Blick auf eine Anlage
@@ -20,6 +20,17 @@ Beide sind **read-only**. Du kannst von hier aus nichts an einer Anlage verände
 > `mcp__ESKS__get_burner_status`. Beide haben genau einen Parameter (`query` bzw. `serial_number`)
 > und keinen Clearance-Parameter, weil es keinen braucht: die Prüfung hängt am API-Key des
 > Fragenden und passiert serverseitig.
+
+## Ein Gerät, viele Namen
+
+**`burner`, `Brenner`, `COR.gen`, `cor.gen` und `corgen` bezeichnen dasselbe Produkt.** Die
+Schreibweise sagt nichts über die Sache aus — sie hängt daran, wer gerade spricht: im Marketing
+`COR.gen`, im Code und in den Tool-Namen `burner`, im Betrieb oft nur „der Brenner" oder „die
+Anlage". Behandle alle Varianten gleich und frag nicht nach, welche gemeint ist.
+
+Praktisch heißt das: „Wie geht's dem Burner in Halle 3?", „Status der corgen 4711?" und „Läuft die
+COR.gen noch?" führen alle hierher. Und wenn du selbst eine Anlage benennst, nimm die Schreibweise,
+die dein Gegenüber benutzt hat, statt sie zu korrigieren.
 
 ## Preflight — ist ESKS überhaupt verbunden?
 
@@ -83,9 +94,24 @@ Bei der Auswahlliste: pro Eintrag die **Seriennummer** zeigen, dazu den **`text`
 ist, und den **`cluster`**, wenn er bei der Unterscheidung hilft (ein `dev01` neben einem
 Produktivcluster ist genau die Information, die die Wahl leicht macht).
 
-**`text` ist derzeit immer `null`.** Das Feld wird später den internen Gerätenamen tragen. Zeig es
-an, sobald es gefüllt ist — aber erfinde nichts, solange es `null` ist, und schreib in die Liste
-dann eben nur die Seriennummer.
+**`text` trägt den internen Gerätenamen** — den Namen, unter dem die Techniker die Anlage in der
+Halle und auf den Prüfständen führen, weil sich niemand Seriennummern merken will. Genau dafür ist
+`find_burner` da: der Name ist das, was der Mensch sagt, die Seriennummer das, was das System
+braucht.
+
+Zwei Dinge dazu:
+
+- **Der Name ist keine Kennung.** Er wird von Hand vergeben und kann sich ändern — ein Gerät, das
+  gestern „chriseins" hieß, kann heute anders heißen, und derselbe Name kann später an einer
+  anderen Maschine hängen. Verlass dich nie auf ihn, um eine Anlage über die Zeit
+  wiederzuerkennen; dafür gibt es die Seriennummer. Merk dir auch keinen Namen aus einem früheren
+  Gespräch — frag lieber neu ab.
+- **Beides zeigen, wenn du eine Anlage benennst**: Name *und* Seriennummer, also
+  *„cor-xc001 (`chriseins`)"*. Der Name macht die Antwort lesbar, die Nummer macht sie
+  überprüfbar.
+
+Ist `text` doch mal `null`, gilt weiter: nichts erfinden, nicht als „unbenannt" verkaufen — dann
+steht in der Liste eben nur die Seriennummer.
 
 **4. `warnings` gilt für ALLE diese Antworten.** Das Feld kann in jeder Antwort von `find_burner`
 *und* von `get_burner_status` auftauchen und bedeutet immer dasselbe: **ein Cluster war nicht
@@ -108,6 +134,11 @@ heißt: keine Warnungen.
 umschließende Leerzeichen werden weggebügelt, andere Schreibvarianten aber nicht — `"COR XC 001"`
 und `"COR-XC-001"` finden `cor-xc001` **nicht**. Auch Teilstrings ziehen nicht (`"cor-xc"` → 0
 Treffer), und Clusternamen sind keine Suchbegriffe.
+
+**Bei internen Namen ist die Suche großzügiger.** Eine Teilangabe reicht dort: `"chris"` findet
+`chriseins` und `chriszwei`. Das ist beobachtet, nicht zugesichert — verlass dich nicht darauf,
+aber probier bei einem Namen ruhig die Kurzform, bevor du nachfragst. Rechne dabei mit mehreren
+Treffern (siehe `choose_one` oben): gerade Namensfragmente treffen leicht eine ganze Familie.
 
 Praktische Folge: **`match_count: 0` ist kein Beweis, dass es die Anlage nicht gibt.** Wenn die
 Eingabe nach einer verunstalteten Seriennummer aussah, sag ehrlich, dass du nichts gefunden hast,
@@ -240,7 +271,11 @@ ehrliches „das ist, was ich sehe".
 - Bei `too_many_matches` nicht dieselbe Query nochmal schicken. Um eine genauere Angabe bitten.
 - `warnings` gilt für **beide** Tools und für **jede** Antwortform — auch für Auswahllisten und für
   `match_count: 0`. Ungelesen erklärst du eine existierende Anlage für nicht existent.
-- `text` ist heute `null`. Nicht füllen, nicht erraten, nicht als „unbenannt" verkaufen.
+- `burner`, `Brenner`, `COR.gen`, `cor.gen`, `corgen` sind dasselbe. Keine Rückfrage, welche
+  Variante gemeint ist.
+- `text` ist der interne Name: von Hand vergeben, änderbar. Zum Anzeigen ja, zum Identifizieren
+  nein — dafür die Seriennummer. Ist er `null`: nicht füllen, nicht erraten, nicht als
+  „unbenannt" verkaufen.
 - `data_stale` und `enabled: false` gehören **vor** die Interpretation, nicht dahinter.
 - `data_stale: false` gilt für die Anlage, nicht für jeden Einzelwert — `timestamp_utc` pro Wert prüfen.
 - `-273.2 °C` ist kein Messwert. Nie als Temperatur weitergeben.
@@ -256,11 +291,13 @@ ehrliches „das ist, was ich sehe".
 {status, match_count, matches[{serial_number, text, cluster}], warnings}
 ```
 
-- **verifiziert:** `match_count: 0` (dann fehlt `matches` komplett) und `match_count: 1`.
-  `text` kam bisher immer als `null`, `cluster` immer gefüllt.
-- **noch nicht gegen echte Daten gesehen:** `action_required: "choose_one"` und
-  `error: "too_many_matches"`. Behandle sie wie oben beschrieben, aber sei nicht überrascht, wenn
-  neben ihnen weitere Felder stehen — und verlass dich nicht darauf, dass `match_count` dabei gesetzt ist.
+- **verifiziert:** `match_count: 0` (dann fehlt `matches` komplett), `match_count: 1` sowie
+  `match_count: n` zusammen mit `action_required: "choose_one"` und einem erklärenden `message`.
+  `text` trägt den internen Gerätenamen (in früheren Ständen immer `null`), `cluster` ist immer
+  gefüllt.
+- **noch nicht gegen echte Daten gesehen:** `error: "too_many_matches"`. Behandle es wie oben
+  beschrieben, aber sei nicht überrascht, wenn daneben weitere Felder stehen — und verlass dich
+  nicht darauf, dass `match_count` dabei gesetzt ist.
 
 ### `get_burner_status(serial_number)`
 
@@ -314,10 +351,10 @@ Kein Treffer:
    `get_burner_status` versuchen, direkt `find_burner(query="der Kessel in der Technikhalle")`.
 2. `match_count: 3`, `action_required: "choose_one"`, `warnings` meldet Cluster `prod02` als
    nicht erreichbar.
-3. Antwort: *„Auf die Angabe passen drei Anlagen — welche meinst du? `cor-xc001` (dev01),
-   `xc001` (dev01), `cor-ab042` (prod01). Zwei Hinweise dazu: interne Namen führt das System noch
-   nicht, deshalb nur die Nummern. Und der Cluster prod02 war gerade nicht erreichbar — falls deine
-   Anlage dort hängt, fehlt sie in der Liste."*
+3. Antwort: *„Auf die Angabe passen drei Anlagen — welche meinst du? `cor-xc001` (`chriseins`,
+   dev01), `cor-xc002` (`chriszwei`, dev01), `cor-ab042` (`halle3-nord`, prod01). Ein Hinweis
+   dazu: der Cluster prod02 war gerade nicht erreichbar — falls deine Anlage dort hängt, fehlt sie
+   in der Liste."*
 4. Erst nach der Wahl: `get_burner_status` mit der gewählten Nummer.
 
 ### C — Seriennummer, aber verunstaltet
