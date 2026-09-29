@@ -1,6 +1,6 @@
 ---
 name: ingest
-description: "Spielt Dokumente in die COR.metis Knowledgebase ein (Ingest/Pflege). Nutze diesen Skill, wenn jemand ein Dokument (PDF, Datenblatt, Modbus-Tabelle, TÜV-Bericht, Präsentation, Anlagenbeschreibung, FAQ) in die KB aufnehmen, aktualisieren, neu klassifizieren oder versionieren will. Klassifiziert Vertraulichkeit und Typen, zerlegt in Chunks, baut Frontmatter, hängt Bilder an und gibt eine begutachtbare Review-Liste mit Deep-Links zurück. Greift auf den ESKS-MCP-Server zu."
+description: "Spielt Dokumente in die COR.metis Knowledgebase ein (Ingest/Pflege). Nutze diesen Skill, wenn jemand ein Dokument (PDF, Datenblatt, Modbus-Tabelle, TÜV-Bericht, Präsentation, Anlagenbeschreibung, FAQ) in die KB aufnehmen, aktualisieren, neu klassifizieren oder versionieren will. Klassifiziert Vertraulichkeit und Typen, zerlegt in Chunks, baut Frontmatter, legt aus Tabellen (Fehlercode-Listen, Teile-/SKU-Listen, Hersteller-/Lieferantentabellen) nachschlagbare Tabellen-Einträge an, hängt Bilder an und gibt eine begutachtbare Review-Liste mit Deep-Links zurück. Greift auf den ESKS-MCP-Server zu."
 ---
 
 # COR.metis Ingest-Skill
@@ -14,6 +14,7 @@ Nimmt Dokumente strukturiert in die Knowledgebase auf — sicher, nachvollziehba
 - **Klassifikation per LLM-Reasoning, NICHT `suggest_type`** — Embeddings diskriminieren zu schlecht. `suggest_type` ist unbrauchbar.
 - **Sicherheit vor Bequemlichkeit:** lieber über-restriktiv klassifizieren als leaken.
 - **Bild-Bytes gehen nie durch den Context.** Upload ausschließlich binär per Ticket, niemals base64.
+- **Tabellen doppelt ablegen:** lesbar im Chunk-Body **und** Zeile für Zeile als Tabellen-Einträge dieses Chunks. Nur Einträge machen Codes nachschlagbar — Vektorsuche ist für Kennungen blind.
 
 ---
 
@@ -63,11 +64,12 @@ Nicht weiterarbeiten, bis beide Checks grün sind. Kein Teil-Ingest „schon mal
 1. **Lesen.** `pdfinfo` → Seitenzahl; PDF in Etappen (≤20 Seiten je Read) **vollständig** lesen — inkl. Deckblatt/Klassifikationsseite.
 2. **Klassifizieren** (confidentiality + doc_type + sub_doc_type).
 3. **Zerlegen** in sinnvolle Chunks (ein Thema je Chunk; Tabellen/Register-Bereiche zusammenhalten).
-4. **Frontmatter bauen** (Vorlage unten), pro Chunk.
-5. **Einspielen** via `ingest_chunk` — ein Chunk je Call. Vorab `ingest_smart` (read-only) gegen Dubletten prüfen.
-6. **Bilder anhängen** per Upload-Ticket (siehe unten).
-7. **Verifizieren** (Stichprobe + Suche + Stats).
-8. **Review-Liste** mit Deep-Links zurückgeben.
+4. **Tabellen erkennen & inspizieren** — enthält das Dokument Tabellendaten oder Key/Value-Artiges? Dann Namespaces prüfen, bei einer neuen Version den Ist-Stand der Einträge holen und die Differenz berichten (siehe [Tabellen-Einträge](#tabellen-einträge-entries)). Neuer Namespace nur nach Zustimmung.
+5. **Frontmatter bauen** (Vorlage unten), pro Chunk — Chunks mit Einträgen brauchen `logical_key` und `document_lineage`.
+6. **Einspielen** via `ingest_chunk` — ein Chunk je Call, Einträge im `entries`-Argument. Vorab `ingest_smart` (read-only) gegen Dubletten prüfen. Neue Version: `replace_document` mit `entries_by_logical_key`.
+7. **Bilder anhängen** per Upload-Ticket (siehe unten).
+8. **Verifizieren** (Stichprobe + Suche + Stats + Einträge).
+9. **Review-Liste** mit Deep-Links und Eintragszahlen zurückgeben.
 
 ## Confidentiality (sicherheitskritisch)
 
@@ -96,7 +98,7 @@ Stufe **aus dem Dokument** lesen (Deckblatt/Fußzeile), in Integer übersetzen:
 - **Auto-ID:** `id` weglassen → Server leitet aus `source_document_id` + slug(`logical_key`) ab.
 - `document_lineage` bleibt **stabil über alle Versionen**; `source_document_id` ist pro Version verschieden.
 - **`logical_key` — wichtigste Regel:** Für verschiedene Versionen DESSELBEN Dokuments **müssen** die `logical_key`s übereinstimmen (NICHT pro Version namespacen!). Nur so greifen `replace_document`, `diff_versions`, Supersede. Verschiedene Dokumente = verschiedene `document_lineage`.
-- **Neue Version:** `find_lineage` → `replace_document(commit=false)` (Alignment-Manifest) → Review → `replace_document(commit=true)`. Rollback nur bewusst via `revert_document`.
+- **Neue Version:** `find_lineage` → Einträge-Ist-Stand + Differenzbericht (siehe Tabellen-Einträge) → `replace_document(commit=false)` (Alignment-Manifest, zeigt `entry_count` je Chunk) → Review → `replace_document(commit=true)`. Rollback nur bewusst via `revert_document`.
 
 ## Doc-Metadaten
 
@@ -126,6 +128,144 @@ supersedes: null
 # Modbus-Register – Energiezählung
 Body als Markdown …
 ```
+
+---
+
+## Tabellen-Einträge (entries)
+
+Ein **Eintrag** ist ein kleiner, strukturierter Fakt aus einer Tabelle des Quelldokuments. Das
+Orakel findet ihn per `lookup` (exakt, bei Tippfehlern fuzzy) und über die `entries`-Liste von
+`search` — auch aus einer Symptombeschreibung. Ohne Eintrag bleibt „Fehlercode 123" für die KB
+unauffindbar, egal wie sauber der Chunk ist.
+
+| Feld | Inhalt | Beispiel |
+|---|---|---|
+| `namespace` | welche Art Fakt | `device_error_codes`, `primary_manufacturers` |
+| `key` | die Kennung, **wie in der Quelle geschrieben** | `123`, `E-05`, `AB531183XYZ`, `side channel compressor` |
+| `value` | kurze Antwort, englisch, ≤ 500 Zeichen | `side channel compressor overheated` |
+| `notes` | optional: Ursache, Abhilfe, Erläuterung, englisch, ≤ 4000 Zeichen | `Check the cooling air intake …` |
+| `embedding_text` | ein natürlicher englischer Satz für die semantische Suche, mit Produkt | `error code 123 of the COR.gen: the side channel compressor has overheated` |
+
+Ein Eintrag gehört **immer zu dem Chunk, aus dem er stammt**, und über ihn zu genau einer
+Dokumentversion. Vertraulichkeit, `review_status` und Produkt erbt er vom Dokument — er hat keine
+eigenen. Einträge ohne Quell-Chunk gibt es nicht.
+
+### Wann Einträge anlegen
+
+Sobald eine Quelle Tabellendaten enthält oder etwas, das von Natur aus Key und Value ist:
+
+- Fehlercode- und Meldungslisten
+- Teile-, Artikel- und SKU-Listen
+- Hersteller- und Lieferantentabellen
+- Registertabellen, **wenn die Registernummer das ist, wonach Leute fragen**
+
+Der Chunk bleibt, wie er ist — die Tabelle steht weiter lesbar im Body — **und** ihre Zeilen kommen
+als Einträge dazu.
+
+**Nie** Einträge für Geräte-Seriennummern. Die leben in der Live-Anlagenverwaltung (`find_burner`).
+
+### Vorher inspizieren (Pflicht)
+
+1. **`list_namespaces`** aufrufen. Passt ein vorhandener Namespace, **wiederverwenden** — Beschreibung
+   und `key_type` lesen, Normalisierungsregeln (`strip_prefixes`, `strip_leading_zeros`) gegen die
+   Keys der Quelle halten.
+2. **Bei einer neuen Version eines vorhandenen Dokuments:** `find_lineage` → `source_document_id` der
+   aktuellen Version → `list_entries(source_document_id: …, limit: 500)`. **`truncated` prüfen** —
+   ist es `true`, pro `namespace` oder `chunk_id` nachladen, bis der Ist-Stand vollständig ist.
+   Dann dem User den **Differenzbericht** zeigen, bevor irgendetwas geschrieben wird:
+
+   ```
+   Einträge device_error_codes — v3 → v4
+   + neu (4):       130, 131, 132, E-07
+   − entfallen (1): 118            ← nach dem Replace aus der Suche verschwunden
+   ~ geändert (2):  123  value: "compressor overheated" → "side channel compressor overheated"
+                    155  notes geändert
+   = unverändert:   41
+   ```
+
+   Entfallene Keys ausdrücklich benennen — das ist die Stelle, an der ein versehentlich
+   abgeschnittener Tabellenteil auffällt.
+3. **Nur wenn nichts passt:** einen neuen Namespace **vorschlagen** und auf Zustimmung warten:
+   - `id` in `lower_snake_case`, englische Beschreibung (1–2 Sätze: was die Keys identifizieren,
+     woher sie stammen), `key_type`:
+     - `code` — Kennungen; exakt, dann fuzzy (ab 3 Zeichen) gefunden.
+     - `text` — Namen und Begriffe, **englisch**; exakt, dann semantisch gefunden.
+     `key_type` ist später **nicht** änderbar.
+   - bei `code`: sollen Präfixe wie `E` oder `F` entfernt werden (`strip_prefixes`, längere zuerst),
+     sollen führende Nullen fallen (`strip_leading_zeros`)? Mit echten Keys aus der Quelle
+     vorrechnen, was dabei herauskommt.
+   - **Präfix nur strippen, wenn er nichts bedeutet:** sind `E05` und `F05` verschiedene Meldungen,
+     dürfen `E` und `F` nicht weg — sonst werden beide zu `05`.
+   - `id` und Beschreibung sieht **jeder** Mitarbeiter, die `id` auch der Kundensupport-Bot — nichts
+     Vertrauliches hinein.
+   - Erst nach „ja" `create_namespace` aufrufen. Er startet als **provisional**; ein Administrator
+     gibt ihn frei.
+   - **Die Normalisierungsregeln frieren mit dem ersten Eintrag ein.** Keine Einträge in einen neuen
+     Namespace schreiben, bevor der User die Regeln gegen die echte Quelle bestätigt hat.
+
+### Wie schreiben
+
+- **`ingest_chunk`** nimmt ein optionales `entries`-Array; **`replace_document`** nimmt
+  `entries_by_logical_key`: Objekt von `logical_key` des Chunks → seine Einträge.
+- **Eine neue Version ist eine neue Liste.** Bei `replace_document` die **vollständigen** Einträge
+  für **jeden** Chunk mitgeben, der welche hat — nicht nur die geänderten. Die Einträge der alten
+  Version gehen mit ihr in Rente; was fehlt, ist aus der Suche verschwunden.
+- **`entries` bei `ingest_chunk` auf einen bestehenden Chunk:**
+
+  | Argument | Wirkung |
+  |---|---|
+  | weggelassen | vorhandene Einträge bleiben unverändert |
+  | `[]` | alle Einträge des Chunks werden **entfernt** |
+  | Liste | ersetzt die Einträge des Chunks komplett |
+
+  `[]` nur bewusst, nie aus Versehen.
+- **Neuer Chunk mit `supersedes:`** ist eine neue Version *dieses* Chunks: die Einträge des alten
+  gehen mit ihm in Rente, der neue hat **nur**, was du mitgibst. `entries` weglassen heißt dort:
+  der neue Chunk hat keine.
+- Ein Chunk mit Einträgen **muss** einen `logical_key` haben und zu einer `document_lineage` gehören
+  (eigene oder die seines Dokuments) — sonst lehnt der Server ab, auch bei einem späteren Re-Ingest,
+  der den `logical_key` eines Chunks mit Einträgen fallen ließe. Grund: ohne `logical_key` könnte ein
+  späteres `replace_document` den Chunk nicht ablösen, und seine alten Werte blieben neben der neuen
+  Version auffindbar.
+- Neue Dokumente tragen **immer** ein explizites `confidentiality` im Frontmatter — Tabellendokumente
+  auch. Die Einträge erben es.
+- **Höchstens 500 Einträge pro Chunk.** Längere Tabellen entlang ihrer natürlichen Abschnitte auf
+  mehrere Chunks verteilen (z.B. nach Baugruppe oder Codebereich), jeder mit eigenem stabilen
+  `logical_key`.
+- **Ein Key höchstens einmal pro Namespace und Dokumentversion** — und zwar nach Normalisierung
+  (`E-05` und `5` können derselbe Key sein). Führt die Quelle selbst einen Key doppelt mit
+  unterschiedlicher Bedeutung: **stoppen und dem User zeigen** — das ist ein Fehler in der Quelle,
+  nicht etwas, das du auflöst.
+- **Keys wie in der Quelle** (`E-05` bleibt `E-05`); der Server normalisiert.
+- **`value` und `notes` englisch.** `value` kurz; Erklärungen, Ursachen, Abhilfe gehören in `notes`.
+- **Keine URLs in `value` oder `notes`.** Der Kundensupport-Bot entfernt jeden Text mit Link — die
+  ganze Notiz wäre für Kunden weg. Auch keine Seriennummern.
+- **`embedding_text` für jeden Eintrag schreiben:** ein Satz, in dem jemand mit dem Problem es
+  wiedererkennt, **mit Produkt**. Er ersetzt den Key nicht — der wird separat gematcht. Beispiel:
+  `"COR.gen error 42: the fuel store is empty and no pellets reach the burner"`.
+
+Beispiel `ingest_chunk` (Werte erfunden):
+
+```json
+{
+  "markdown": "---\ntitle: \"Fehlercodes 100–199\"\ndocument_lineage: corgen_error_codes\nlogical_key: corgen_error_codes/100-199\nconfidentiality: 300\n...\n---\n\n| Code | Meldung | Abhilfe |\n|---|---|---|\n| 123 | Seitenkanalverdichter überhitzt | … |",
+  "entries": [
+    {
+      "namespace": "device_error_codes",
+      "key": "123",
+      "value": "Side channel compressor overheated",
+      "notes": "Check the cooling air intake for blockage; let the unit cool down before restarting.",
+      "embedding_text": "COR.gen error 123: the side channel compressor has overheated"
+    }
+  ]
+}
+```
+
+### Danach
+
+Pro Chunk berichten, **wie viele Einträge in welchen Namespaces** geschrieben wurden — zusammen mit
+der üblichen Review-Liste. Einträge werden erst auffindbar, wenn das Dokument freigegeben ist, genau
+wie Chunks.
 
 ---
 
@@ -175,16 +315,18 @@ Warum: base64 bläht die Bytes um ~33% auf und schiebt sie durch den LLM-Context
 - **Ein Dokument pro Subagent**, parallel — 8 gleichzeitig bewährt.
 - **Preflight nur einmal** im Hauptlauf, nicht pro Subagent.
 - **Typ-Anlage zentralisieren (Race-Schutz):** Subagenten *melden* fehlende Typen, legen sie **nicht selbst** an. Haupt-Lauf legt Typen einmal zentral an, dann ingesten die Subagenten.
+- **Namespaces genauso:** Subagenten melden fehlende Namespaces samt Beispiel-Keys, der Haupt-Lauf schlägt sie dem User vor und legt sie nach Zustimmung einmal an — erst danach schreiben Subagenten Einträge.
 - `logical_key`-Regel beachten: pro Source-Doc namespacen zerstört das Versions-Alignment.
 
 ## Verifikation
 
 - `get_chunk` an Stichprobe (confidentiality? Typen?), `search` auf erwartete Begriffe, `get_stats` (Zähler plausibel?).
 - Bei Bildern: mindestens ein `image_id` via `get_image_url` auflösen und prüfen, dass eine URL zurückkommt.
+- Bei Einträgen: `list_entries(source_document_id: …)` — Anzahl je Namespace gegen die Quelltabelle halten (`truncated` beachten). Ist das Dokument bereits freigegeben, ein, zwei Keys per `lookup` gegenprüfen; bei `preliminary` sind sie für `lookup` noch unsichtbar, dann reicht `list_entries`.
 
 ## Review-Ergebnis
 
-Pro Datei: `{ deep_link, Titel, #Chunks, #Bilder, confidentiality_label }` → begutachtbare, klickbare Liste.
+Pro Datei: `{ deep_link, Titel, #Chunks, #Bilder, #Einträge je Namespace, confidentiality_label }` → begutachtbare, klickbare Liste. Bei einer neuen Version zusätzlich der Differenzbericht der Einträge.
 
 ## Gotchas (hart gelernt)
 
@@ -196,4 +338,10 @@ Pro Datei: `{ deep_link, Titel, #Chunks, #Bilder, confidentiality_label }` → b
 - Versionen: `logical_key`s teilen, nicht namespacen.
 - C3 (400) wird abgelehnt — Text **und** Bild, gar nicht erst einspielen.
 - **`store_image` mit `file_path` gibt es nicht mehr.** Der serverseitige Dateipfad wurde entfernt und wird aktiv refused (LFI-Fläche, und auf einem Cloud-Service ohnehin sinnlos). Damit sind auch `KB_IMAGE_IMPORT_DIRS` und der Compose-Import-Ordner Geschichte — Bilder gehen nur noch per Ticket-Upload.
+- **Tabellen → Einträge.** Chunk allein macht Codes nicht nachschlagbar.
+- Namespace erst vorschlagen, dann anlegen; Normalisierung frieren mit dem ersten Eintrag ein. Präfixe nur strippen, wenn sie nichts bedeuten.
+- `replace_document`: **vollständige** Einträge aller Chunks mitgeben — Weggelassenes ist weg.
+- `ingest_chunk`: `entries` weglassen = behalten, `[]` = löschen. Bei `supersedes:` heißt Weglassen: keine.
+- Chunks mit Einträgen brauchen `logical_key` + `document_lineage`.
+- Einträge englisch, keine URLs, keine Seriennummern, ≤ 500 je Chunk, Key einmal pro Namespace und Version.
 - **`ingest_file` und `ingest_directory` existieren nicht.** Es gibt nur `ingest_chunk` (ein Chunk je Call) und `replace_document` (ganze Version). Wer nach Batch-Tools sucht, sucht vergeblich.
