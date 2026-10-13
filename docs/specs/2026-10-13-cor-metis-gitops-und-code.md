@@ -107,8 +107,8 @@ Dazu kommt ein manuell per `claude mcp add` angelegter Server, dessen Name frei 
 schlägt bisher klein `cgss` vor).
 
 Die Skills nennen deshalb **keinen festen Präfix** mehr, sondern den Server und den nackten Tool-Namen
-(„`get_stats` vom ESKS-Server“) mit der Regel: *das Segment unmittelbar vor `__<tool>` ist `ESKS` bzw.
-`CGSS`, Groß-/Kleinschreibung egal*. Nachgeladene („deferred“) Tools werden per ToolSearch-Stichwortsuche
+(„`get_stats` vom ESKS-Server“) mit der Regel: *der Teil zwischen `mcp__` und `__<tool>` ist `ESKS` bzw.
+`CGSS` oder endet auf `_ESKS` bzw. `_CGSS`, Groß-/Kleinschreibung egal*. Nachgeladene („deferred“) Tools werden per ToolSearch-Stichwortsuche
 gefunden („ESKS get_stats“), nie per `select:` mit festem Namen. Das gilt für die vier bestehenden Skills
 ebenso wie für die neuen.
 
