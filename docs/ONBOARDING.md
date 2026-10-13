@@ -47,7 +47,7 @@ Das ist der einzige Schritt, der etwas Sorgfalt braucht. Danach nie wieder.
 2. **„Connector hinzufügen" → „Benutzerdefinierter Connector".**
 3. **Name:** `ESKS`
 
-   > ⚠️ **Exakt so, in Großbuchstaben.** Nicht „COR.metis", nicht „Metis", nicht „esks". Der Name ist
+   > ⚠️ **Genau so, am besten in Großbuchstaben.** Nicht „COR.metis", nicht „Metis". Der Name ist
    > die Adresse, unter der COR.metis den Zugang später sucht — stimmt er nicht, ist alles verbunden
    > und trotzdem funktioniert nichts. Das ist mit Abstand der häufigste Stolperstein.
 
@@ -158,7 +158,7 @@ welcher Stelle es hakt. Zur Einordnung:
 
 | Symptom | Wahrscheinliche Ursache |
 |---|---|
-| „Ich finde dazu nichts in der Knowledgebase", obwohl es das Dokument gibt | Connector heißt nicht exakt `ESKS` |
+| „Ich finde dazu nichts in der Knowledgebase", obwohl es das Dokument gibt | Connector heißt nicht `ESKS` |
 | Claude antwortet aus Allgemeinwissen statt aus unseren Unterlagen | Plugin nicht installiert, oder Session vor der Installation gestartet |
 | Fehlermeldung mit „unauthorized" / 403 | Key falsch, abgelaufen oder beim Kopieren beschädigt → bei Chris melden |
 | Zeitüberschreitung, „Server nicht erreichbar" | Du bist nicht im Firmennetz / nicht im VPN |
@@ -176,3 +176,68 @@ Dein Key ist deine Identität — nicht weitergeben, nicht in Chats tippen, nich
 Was du siehst, entscheidet der Server anhand deines Keys; COR.metis kann dir nichts zeigen, wofür du
 nicht freigegeben bist. Wenn du einen Text nach draußen schreibst, sag es dazu — dann sucht COR.metis
 von vornherein nur in freigegebenem Material.
+
+---
+
+## Für Entwickler: Deployments im Blick
+
+**Diesen Abschnitt kannst du überspringen**, wenn du nicht an unseren Diensten entwickelst oder sie
+betreibst.
+
+Mit dem Plugin **`cor-metis-gitops`** fragst du Claude, was auf unseren Umgebungen läuft — ohne
+Argo CD aufzumachen. Claude liest dabei nur mit; ausrollen, synchronisieren oder etwas ändern kann es
+nicht.
+
+Dafür brauchst du eine **Engineer-Rolle** (DEVELOPER oder OPERATOR; ADMIN und MASTER gehen auch).
+Ob du eine hast, weiß Chris.
+
+1. **Einstellungen → Plugins**, im Marketplace von Schritt 1 zusätzlich **`cor-metis-gitops`**
+   hinzufügen.
+2. **Einstellungen → Konnektoren**, wie in Schritt 2 einen zweiten benutzerdefinierten Connector:
+   - **Name:** `CGSS`
+   - **URL:** derselbe Key wie bei ESKS, nur ein anderer Pfad:
+
+     ```
+     https://internal.cor.energy/cgss/mcp?apikey=DEIN_KEY
+     ```
+
+3. **Neue Session** starten und fragen:
+
+   > **prüf mal, ob COR.metis bei mir läuft**
+
+   Der Check prüft CGSS gleich mit.
+
+Dann zum Beispiel:
+
+- „Welche Version von ESKS läuft auf central?"
+- „Unterscheiden sich dev01 und dev02?"
+- „Ich hab gepusht — sag Bescheid, wenn's auf dev01 läuft."
+- „Warum startet BDUS auf dev02 dauernd neu?"
+
+Ohne Engineer-Rolle verweigert CGSS die Verbindung, und die Fragen oben laufen ins Leere. Alles
+andere an COR.metis funktioniert trotzdem.
+
+---
+
+## Claude Code statt Desktop
+
+Wenn du in **Claude Code** arbeitest, geht es ohne Connector und ohne Key in einer URL. Im Terminal,
+in einer Claude-Code-Session:
+
+```
+/plugin marketplace add burners-software/cormetis-client
+/plugin install cor-metis@cor-metis-client
+/plugin install cor-metis-gitops@cor-metis-client
+/plugin install cor-metis-code@cor-metis-client
+```
+
+`cor-metis-gitops` nur, wenn du eine Engineer-Rolle hast (siehe oben). Beim Installieren von
+`cor-metis-code` fragt Claude Code **einmal** nach deinem Key — dort, in dieses Feld, und nirgends
+sonst. Danach stehen ESKS und CGSS bereit.
+
+**Hast du die Connectoren auch in Claude Desktop?** Dann tauchen sie in Claude Code noch ein zweites
+Mal auf, als `claude.ai ESKS` und `claude.ai CGSS`. Tippe `/mcp` und deaktiviere diese beiden — sonst
+ist alles doppelt da.
+
+Key ändern, Speicherort und was bei fehlender Engineer-Rolle passiert:
+[README von `cor-metis-code`](../plugins/cor-metis-code/README.md).
