@@ -1,0 +1,22 @@
+{
+  "name": "cor-metis-code",
+  "version": "0.1.0",
+  "description": "Nur Claude Code: verbindet ESKS und CGSS mit deinem persönlichen COR.metis-Key. Enthält keine Skills.",
+  "author": {
+    "name": "COR Energy World GmbH",
+    "url": "https://cor.energy"
+  },
+  "homepage": "https://github.com/burners-software/cormetis-client",
+  "repository": "https://github.com/burners-software/cormetis-client",
+  "license": "UNLICENSED",
+  "keywords": ["cor", "metis", "esks", "cgss", "claude-code"],
+  "userConfig": {
+    "api_key": {
+      "type": "string",
+      "title": "COR.metis API-Key",
+      "description": "Dein persönlicher COR.metis-Key (gilt für ESKS und CGSS). Nie weitergeben, nie in einen Chat tippen.",
+      "sensitive": true,
+      "required": true
+    }
+  }
+}

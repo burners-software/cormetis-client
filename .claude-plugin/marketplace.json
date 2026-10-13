@@ -10,6 +10,18 @@
       "version": "0.2.0",
       "description": "COR.metis — Wissens-Orakel, Anlagen-Livestatus und Dokumenten-Ingest für COR Energy",
       "source": "./plugins/cor-metis"
+    },
+    {
+      "name": "cor-metis-gitops",
+      "version": "0.1.0",
+      "description": "COR.metis Gitops — Deployment-Status, Warten auf Rollouts und Diagnose über CGSS (für Entwickler)",
+      "source": "./plugins/cor-metis-gitops"
+    },
+    {
+      "name": "cor-metis-code",
+      "version": "0.1.0",
+      "description": "Nur Claude Code: verbindet ESKS und CGSS mit deinem persönlichen COR.metis-Key. Enthält keine Skills.",
+      "source": "./plugins/cor-metis-code"
     }
   ]
 }
