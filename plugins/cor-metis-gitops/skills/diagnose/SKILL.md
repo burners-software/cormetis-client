@@ -45,6 +45,20 @@ die Ursache belegt ist.
 - `unhealthy_resources` — welche Ressource woran krankt (Degraded zuerst, höchstens 20,
   `unhealthy_resources_truncated`). Ist es `null` mit `unhealthy_resources_error`, ist der Zustand
   der Ressourcen **unbekannt**, nicht gesund.
+- `out_of_sync_resources` — welche Ressourcen vom Repo abweichen (Kind, Namespace, Name, Status,
+  `requires_pruning`; höchstens 20, `out_of_sync_resources_truncated`). Bei `OutOfSync` **zuerst
+  hier hinschauen.** `requires_pruning: true` heißt: steht im Cluster, aber nicht mehr im Repo. Den
+  Diff selbst liefert CGSS bewusst nicht (Live-Manifeste können Secrets enthalten) — die Ursache
+  einer Abweichung findest du im Repo bzw. in der Argo-CD-Oberfläche. Fehlt das Feld in der Antwort,
+  läuft eine ältere CGSS-Version; dann die Abweichung über das Repo erschließen.
+
+**OutOfSync bei Healthy, und Argo synct immer wieder „erfolgreich“** (Events `OperationCompleted`
+*„Partial sync operation … succeeded“* im Abstand weniger Minuten, danach sofort wieder OutOfSync):
+das ist **dauerhafte Drift**, kein kaputter Rollout. Argo wendet das Manifest an, aber der Cluster
+schreibt Felder zurück, die im Repo fehlen. Typische Ursache: eine Ressource mit vom Controller
+ergänzten Feldern (z.B. HTTPRoute mit CRD-Defaults und Gateway-Write-backs) ohne
+`argocd.argoproj.io/compare-options: ServerSideDiff=true` an der Application. Vergleich mit
+gleichartigen Apps im GitOps-Repo — fehlt die Option nur hier, ist das der Befund.
 
 **2. Events — `get_application_events(environment, application)`**, zuerst **ohne**
 `resource_name`. Das liefert die Events der Application plus die von bis zu fünf kranken

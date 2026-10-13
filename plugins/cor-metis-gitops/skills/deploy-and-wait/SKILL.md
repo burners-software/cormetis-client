@@ -108,6 +108,11 @@ Auto-Sync startet die Operation Sekunden nach dem Erkennen der Änderung. Nicht 
 melden: *„Argo synct `<app>` vermutlich nicht automatisch — der Sync muss in Argo CD ausgelöst
 werden. Das kann ich von hier aus nicht.“*
 
+Zeigt `observed` dagegen über zwei Aufrufe `OutOfSync` mit `operation_phase` `Succeeded` **für die
+angefragte Revision**, ist der Sync durch, aber die App driftet sofort wieder weg — darauf zu warten
+bringt nichts. Hol einmal `get_application_status` und nenn die `out_of_sync_resources`, dann
+`cor-metis-gitops:diagnose` mit diesem Befund als Einstieg.
+
 ### Fehler beenden die Schleife sofort
 
 Kommt statt eines Zustands `{"error": {"code": …}}`, **sofort aufhören** und melden. Kein zweiter
