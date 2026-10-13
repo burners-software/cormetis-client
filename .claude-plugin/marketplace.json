@@ -1,5 +1,6 @@
 {
   "name": "cor-metis-client",
+  "description": "COR.metis für Claude Desktop und Claude Code — Wissens-Orakel, Anlagen-Livestatus, Ingest, GitOps-Einblick (COR Energy World GmbH)",
   "owner": {
     "name": "COR.energy",
     "url": "https://cor.energy"
