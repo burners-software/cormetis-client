@@ -35,7 +35,7 @@ Derselbe Server heißt je nach Oberfläche verschieden. Das Tool `get_stats` ers
 | Claude Code, synchronisierter claude.ai-Connector | `mcp__claude_ai_ESKS__get_stats` |
 | Claude Code, Plugin `cor-metis-code` | `mcp__plugin_cor-metis-code_ESKS__get_stats` |
 
-Die Regel: ein Tool gehört zum ESKS-Server, wenn das Segment **unmittelbar vor** `__<tool>` `ESKS` lautet — Groß-/Kleinschreibung egal. Alle drei Varianten oben sind richtig. Sind die Tools als „deferred" gelistet, lade sie erst per ToolSearch-Stichwortsuche nach („ESKS get_stats“), nie per `select:` mit festem Namen — deferred heißt *vorhanden*, nicht *fehlend*. Das ist die häufigste Fehldiagnose an dieser Stelle.
+Die Regel: ein Tool gehört zum ESKS-Server, wenn der Teil zwischen `mcp__` und `__<tool>` `ESKS` ist oder auf `_ESKS` endet — Groß-/Kleinschreibung egal. Alle drei Varianten oben sind richtig, ebenso ein Connector, der klein `esks` heißt (`mcp__esks__get_stats`). Sind die Tools als „deferred" gelistet, lade sie erst per ToolSearch-Stichwortsuche nach („ESKS get_stats“), nie per `select:` mit festem Namen — deferred heißt *vorhanden*, nicht *fehlend*. Das ist die häufigste Fehldiagnose an dieser Stelle.
 
 Vier Fälle, die Verschiedenes bedeuten:
 
@@ -51,7 +51,7 @@ Vier Fälle, die Verschiedenes bedeuten:
 Ein billiger, lesender Call: `get_stats` vom ESKS-Server.
 
 - **Strukturierte Antwort** → Connector *und* Key sind in Ordnung. Der Nutzer ist arbeitsfähig.
-- **401 / 403 / „unauthorized"** → Server erreichbar, Key falsch, abgelaufen oder abgeschnitten. Häufigste Ursache: beim Kopieren ein Zeichen verloren, oder die URL enthält Leerzeichen/Zeilenumbruch.
+- **401 / 403 / „unauthorized"** → Server erreichbar, Key falsch, abgelaufen oder abgeschnitten. Häufigste Ursache: beim Kopieren ein Zeichen verloren, oder die URL enthält Leerzeichen/Zeilenumbruch. In Claude Code den Key neu setzen: `/plugin` → `cor-metis-code` → „Configure options" bzw. `claude plugin configure cor-metis-code`.
 - **DNS-Fehler, Timeout, „connection refused"** → der Nutzer ist nicht im Firmennetz bzw. nicht im VPN, oder die URL ist falsch. Sagt über den Key **nichts** aus.
 
 Fehlertexte **wörtlich** zitieren, nicht paraphrasieren. Der Unterschied zwischen 403 und Timeout ist die halbe Diagnose.
@@ -82,12 +82,12 @@ Schlägt einer fehl → die drei Schalter aus Teil C. Und dazu der Satz, den man
 
 Nur laufen lassen, wenn CGSS-Tools da sind **oder** der Nutzer nach Deployments, Gitops oder CGSS fragt. Wer nur die Knowledgebase nutzt, braucht CGSS nicht — ein fehlendes CGSS ist für ihn `n/a`, kein `FAIL`.
 
-CGSS-Tools erkennst du nach derselben Regel wie in Check 2: das Segment unmittelbar vor `__<tool>` lautet `CGSS`, Groß-/Kleinschreibung egal (von Hand per `claude mcp add` angelegt, heißt er oft klein `cgss` — auch das zählt). Deferred → per ToolSearch-Stichwortsuche nachladen („CGSS list_environments“).
+CGSS-Tools erkennst du nach derselben Regel wie in Check 2: der Teil zwischen `mcp__` und `__<tool>` ist `CGSS` oder endet auf `_CGSS`, Groß-/Kleinschreibung egal (von Hand per `claude mcp add` angelegt, heißt er oft klein `cgss` — auch das zählt). Deferred → per ToolSearch-Stichwortsuche nachladen („CGSS list_environments“).
 
 Ruf `list_environments` vom CGSS-Server auf:
 
-- **Liste kommt** → PASS. Nenne die Environments beim Namen (z.B. `central`, `dev01`, `dev02`).
-- **CGSS-Tools fehlen, obwohl eingerichtet**, bzw. in Claude Code zeigt `/mcp` den Server CGSS als „failed" → entweder ist der Key falsch, **oder** dem Nutzer fehlt eine Engineer-Rolle (DEVELOPER, OPERATOR, ADMIN oder MASTER). CGSS lehnt ohne Rolle schon den Verbindungsaufbau mit 403 ab, deshalb tauchen die Tools gar nicht erst auf. Funktioniert ESKS mit demselben Key (Check 3 grün), ist es fast sicher die Rolle → bei Chris anfragen.
+- **Liste kommt** → PASS. Nenne die Environments, die tatsächlich zurückkommen — nur diese, keine aus der Erinnerung ergänzen (heute meist nur `central-1`; `dev01`/`dev02` erscheinen erst, wenn sie angebunden sind).
+- **CGSS-Tools fehlen, obwohl eingerichtet**, bzw. in Claude Code zeigt `/mcp` den Server CGSS als „failed" → entweder ist der Key falsch, **oder** dem Nutzer fehlt eine Engineer-Rolle (DEVELOPER, OPERATOR, ADMIN oder MASTER, oder `*`). CGSS lehnt ohne Rolle schon den Verbindungsaufbau mit 403 ab, deshalb tauchen die Tools gar nicht erst auf. Funktioniert ESKS mit demselben Key (Check 3 grün), ist es fast sicher die Rolle → bei Chris anfragen.
 - **Noch nicht eingerichtet** → Teil B1 (zweiter Connector `CGSS`) bzw. B2 (`cor-metis-code` bringt CGSS mit).
 
 ### Ergebnis
@@ -118,7 +118,7 @@ Der Weg hängt von der Oberfläche ab: **B1** für Claude Desktop und Cowork, **
 ### B1 — Claude Desktop / Cowork
 
 1. **Einstellungen → Konnektoren → „Connector hinzufügen" → „Benutzerdefinierter Connector".**
-2. **Name:** exakt `ESKS` — Großbuchstaben, sonst nichts.
+2. **Name:** `ESKS` — Großbuchstaben empfohlen, sonst nichts dazu.
 3. **URL:** die Basis-URL mit angehängtem Key:
    ```
    https://internal.cor.energy/esks/mcp?apikey=DEIN_KEY
@@ -129,10 +129,10 @@ Der Weg hängt von der Oberfläche ab: **B1** für Claude Desktop und Cowork, **
 
 **Optional, nur für Entwickler:** ein zweiter Connector für den Deploy-Zugang, gleiche Schritte:
 
-- **Name:** exakt `CGSS`
+- **Name:** `CGSS` (Großbuchstaben empfohlen)
 - **URL:** `https://internal.cor.energy/cgss/mcp?apikey=DEIN_KEY` — derselbe persönliche Key wie für ESKS.
 
-CGSS verlangt zusätzlich eine Engineer-Rolle (DEVELOPER, OPERATOR, ADMIN oder MASTER). Ohne sie lehnt der Server die Verbindung ab — siehe Check 6.
+CGSS verlangt zusätzlich eine Engineer-Rolle (DEVELOPER, OPERATOR, ADMIN oder MASTER, oder `*`). Ohne sie lehnt der Server die Verbindung ab — siehe Check 6.
 
 ### B2 — Claude Code
 
@@ -157,7 +157,7 @@ In Claude Code gibt es keinen Connector zum Abtippen. Das Plugin `cor-metis-code
 
 ### Der Name ist keine Geschmacksfrage
 
-In Claude Desktop und Cowork muss der Connector exakt `ESKS` bzw. `CGSS` heißen, weil die Skills die Tools am Server-Segment erkennen — dem Teil unmittelbar vor `__<tool>`. Heißt der Connector „COR.metis", „Metis" oder „esks-spike", steht dort etwas anderes und die Skills laufen ins Leere — bei einem Nutzer, der schwören würde, dass alles verbunden ist. Das ist die teuerste Fehlerquelle im ganzen Setup. (In Claude Code setzt das Plugin die Namen selbst.)
+In Claude Desktop und Cowork muss der Connector `ESKS` bzw. `CGSS` heißen (Großschreibung empfohlen, klein geht auch), weil die Skills die Tools am Server-Namen erkennen — dem Teil zwischen `mcp__` und `__<tool>`. Heißt der Connector „COR.metis", „Metis" oder „esks-spike", steht dort etwas anderes und die Skills laufen ins Leere — bei einem Nutzer, der schwören würde, dass alles verbunden ist. Das ist die teuerste Fehlerquelle im ganzen Setup. (In Claude Code setzt das Plugin die Namen selbst.)
 
 Hat jemand den Connector schon unter falschem Namen angelegt: umbenennen geht nicht immer sauber. Trennen und neu anlegen ist der verlässlichere Weg.
 
@@ -195,8 +195,8 @@ Warum das nötig ist, falls jemand fragt: Bilder werden binär hochgeladen statt
 
 - **Key nie im Chat.** Weder rein noch raus. Landet doch einer drin: rotieren lassen.
 - **„Deferred" heißt vorhanden.** Erst nachladen, dann urteilen — sonst diagnostizierst du einen fehlenden Connector, der da ist.
-- **Connector-Name exakt `ESKS` bzw. `CGSS`.** Häufigste stille Fehlerquelle.
-- **Präfix egal, Server-Segment zählt.** `mcp__ESKS__…`, `mcp__claude_ai_ESKS__…` und `mcp__plugin_cor-metis-code_ESKS__…` sind alle richtig. Nachladen per Stichwortsuche, nie per `select:` mit festem Namen.
+- **Connector-Name `ESKS` bzw. `CGSS`** (klein geht auch, alles andere nicht). Häufigste stille Fehlerquelle.
+- **Präfix egal, Server-Name zählt** (`ESKS` oder `…_ESKS`). `mcp__ESKS__…`, `mcp__claude_ai_ESKS__…` und `mcp__plugin_cor-metis-code_ESKS__…` sind alle richtig. Nachladen per Stichwortsuche, nie per `select:` mit festem Namen.
 - **Zwei Präfixe = Dublette, kein Fehler.** Hinweis geben (`claude.ai ESKS` in `/mcp` deaktivieren), nicht als FAIL werten.
 - **CGSS „failed", ESKS grün** → fast immer die fehlende Engineer-Rolle, nicht der Key.
 - **403 ≠ Timeout.** Das eine ist der Key, das andere das Netz. Nie zusammenwerfen.

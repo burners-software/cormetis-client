@@ -7,7 +7,7 @@ description: "Spielt Dokumente in die COR.metis Knowledgebase ein (Ingest/Pflege
 
 Nimmt Dokumente strukturiert in die Knowledgebase auf — sicher, nachvollziehbar, versionierbar.
 
-Alle Tools in diesem Skill (`ingest_chunk`, `create_image_upload_ticket`, `lookup` …) kommen vom ESKS-Server. Ihr Präfix hängt von der Oberfläche ab (`mcp__ESKS__…`, `mcp__claude_ai_ESKS__…`, `mcp__plugin_cor-metis-code_ESKS__…`); maßgeblich ist das Segment unmittelbar vor `__<tool>`: `ESKS`, Groß-/Kleinschreibung egal. Deferred Tools per ToolSearch-Stichwortsuche nachladen („ESKS ingest_chunk“), nie per `select:` mit festem Namen.
+Alle Tools in diesem Skill (`ingest_chunk`, `create_image_upload_ticket`, `lookup` …) kommen vom ESKS-Server. Ihr Präfix hängt von der Oberfläche ab (`mcp__ESKS__…`, `mcp__claude_ai_ESKS__…`, `mcp__plugin_cor-metis-code_ESKS__…`); maßgeblich ist der Teil zwischen `mcp__` und `__<tool>`: er ist `ESKS` oder endet auf `_ESKS`, Groß-/Kleinschreibung egal. Deferred Tools per ToolSearch-Stichwortsuche nachladen („ESKS ingest_chunk“), nie per `select:` mit festem Namen.
 
 ## Leitprinzipien
 

@@ -26,7 +26,7 @@ bzw. `COR.gen TwinPower`, nicht `corgen`.
 
 ## Preflight — ist ESKS überhaupt verbunden?
 
-Die Tools heißen je nach Oberfläche verschieden, z.B. `mcp__ESKS__search` (Claude Desktop), `mcp__claude_ai_ESKS__search` (Claude Code, synchronisierter Connector) oder `mcp__plugin_cor-metis-code_ESKS__search` (Claude Code, Plugin `cor-metis-code`). Ein Tool gehört zum ESKS-Server, wenn das Segment **unmittelbar vor** `__<tool>` `ESKS` lautet — Groß-/Kleinschreibung egal. In diesem Skill heißen die Tools deshalb nur beim nackten Namen („`search` vom ESKS-Server“). Sind sie als „deferred" gelistet, lade sie per ToolSearch-Stichwortsuche nach („ESKS search“) — nie per `select:` mit festem Namen, der stimmt nur auf einer Oberfläche.
+Die Tools heißen je nach Oberfläche verschieden, z.B. `mcp__ESKS__search` (Claude Desktop), `mcp__claude_ai_ESKS__search` (Claude Code, synchronisierter Connector) oder `mcp__plugin_cor-metis-code_ESKS__search` (Claude Code, Plugin `cor-metis-code`). Ein Tool gehört zum ESKS-Server, wenn der Teil zwischen `mcp__` und `__<tool>` `ESKS` ist oder auf `_ESKS` endet — Groß-/Kleinschreibung egal. In diesem Skill heißen die Tools deshalb nur beim nackten Namen („`search` vom ESKS-Server“). Sind sie als „deferred" gelistet, lade sie per ToolSearch-Stichwortsuche nach („ESKS search“) — nie per `select:` mit festem Namen, der stimmt nur auf einer Oberfläche.
 
 Sind die ESKS-Tools nicht verfügbar (auch nicht als „deferred" nachladbar), fehlt dem Nutzer der Connector. Dann **nicht** herumprobieren und **nicht** aus Allgemeinwissen antworten. Sag es klar und verweise weiter:
 

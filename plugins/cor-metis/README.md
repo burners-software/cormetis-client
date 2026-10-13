@@ -25,7 +25,7 @@ seinem persönlichen API-Key ein — er ist die Identität, an der die Freigabes
   in Claude Code unter `/mcp` die synchronisierten Server `claude.ai ESKS` / `claude.ai CGSS`, sonst
   stehen alle Tools doppelt da.
 
-Die Skills finden die ESKS-Tools unter jedem dieser Wege: maßgeblich ist das Server-Segment `ESKS`
+Die Skills finden die ESKS-Tools unter jedem dieser Wege: maßgeblich ist der Server-Name `ESKS`
 im Tool-Namen, nicht der Präfix davor.
 
 Anleitung: **[docs/ONBOARDING.md](../../docs/ONBOARDING.md)** im Repo-Root.

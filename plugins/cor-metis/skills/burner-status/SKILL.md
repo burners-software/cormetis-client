@@ -34,7 +34,7 @@ die dein Gegenüber benutzt hat, statt sie zu korrigieren.
 
 ## Preflight — ist ESKS überhaupt verbunden?
 
-Die Tools heißen je nach Oberfläche verschieden, z.B. `mcp__ESKS__find_burner` (Claude Desktop), `mcp__claude_ai_ESKS__find_burner` (Claude Code, synchronisierter Connector) oder `mcp__plugin_cor-metis-code_ESKS__find_burner` (Claude Code, Plugin `cor-metis-code`). Ein Tool gehört zum ESKS-Server, wenn das Segment **unmittelbar vor** `__<tool>` `ESKS` lautet — Groß-/Kleinschreibung egal. Sind sie als „deferred" gelistet, lade sie per ToolSearch-Stichwortsuche nach („ESKS find_burner“) — nie per `select:` mit festem Namen, der stimmt nur auf einer Oberfläche.
+Die Tools heißen je nach Oberfläche verschieden, z.B. `mcp__ESKS__find_burner` (Claude Desktop), `mcp__claude_ai_ESKS__find_burner` (Claude Code, synchronisierter Connector) oder `mcp__plugin_cor-metis-code_ESKS__find_burner` (Claude Code, Plugin `cor-metis-code`). Ein Tool gehört zum ESKS-Server, wenn der Teil zwischen `mcp__` und `__<tool>` `ESKS` ist oder auf `_ESKS` endet — Groß-/Kleinschreibung egal. Sind sie als „deferred" gelistet, lade sie per ToolSearch-Stichwortsuche nach („ESKS find_burner“) — nie per `select:` mit festem Namen, der stimmt nur auf einer Oberfläche.
 
 Sind die ESKS-Tools nicht verfügbar (auch nicht als „deferred" nachladbar), fehlt dem Nutzer der Connector. Das ist etwas völlig anderes als eine abgelehnte Berechtigung — und muss auch anders klingen:
 
