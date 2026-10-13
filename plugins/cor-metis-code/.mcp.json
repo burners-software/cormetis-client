@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "ESKS": {
+      "type": "http",
+      "url": "https://internal.cor.energy/esks/mcp",
+      "headers": { "Authorization": "Bearer ${user_config.api_key}" }
+    },
+    "CGSS": {
+      "type": "http",
+      "url": "https://internal.cor.energy/cgss/mcp",
+      "headers": { "Authorization": "Bearer ${user_config.api_key}" }
+    }
+  }
+}
