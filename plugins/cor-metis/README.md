@@ -25,7 +25,7 @@ seinem persönlichen COR.metis-API-Key ein — er ist die Identität, an der die
   (`/plugin install cor-metis-code@cor-metis-client`). Es bringt die Server ESKS und CGSS mit und
   fragt den Key beim Aktivieren maskiert ab. Wer dieselben Connectoren auch in Desktop hat, deaktiviert
   in Claude Code unter `/mcp` die synchronisierten Server `claude.ai ESKS` / `claude.ai CGSS`, sonst
-  stehen alle Tools doppelt da.
+  entscheidet Claude Code selbst, welche Seite es nimmt.
 
 Die Skills finden die ESKS-Tools unter jedem dieser Wege: maßgeblich ist der Server-Name `ESKS`
 im Tool-Namen, nicht der Präfix davor.

@@ -46,9 +46,12 @@ dessen Beschreibung passt (heute `central-1`). Ist es nicht eindeutig, frag nach
 
 **1. Die App finden.** `list_applications` mit `name_contains` — und **ohne** `environment`, wenn
 die Frage nicht auf ein Environment festgelegt ist. Die Application-Namen in Argo sind nicht die
-Dienstkürzel: „ESKS“ kann als `cor-metis-esks`, `expertsystemknowledgeservice` oder anders heißen.
-Nimm einen kurzen, charakteristischen Teil (`esks`, `knowledge`, `cgss`, `gitops`) und probier bei
-0 Treffern einen zweiten, bevor du aufgibst. Mehrere plausible Treffer → zeigen und fragen, nicht
+Dienstkürzel, sondern tragen den ausgeschriebenen Dienstnamen, auf central-1 z.B.
+`cor-metis-expertsystemknowledgeservice` für ESKS und `cor-metis-claudegitopssupportservice` für CGSS.
+Übersetze das Kürzel deshalb erst in einen Teil des vollen Namens (`knowledge`, `gitopssupport`,
+`supportbot`, `subjectadmin`) — das Kürzel selbst (`esks`, `cgss`) findet meist nichts. Bei
+0 Treffern einen zweiten Namensteil probieren, bevor du aufgibst; im Zweifel `list_applications` ohne
+Filter und selbst suchen. Mehrere plausible Treffer → zeigen und fragen, nicht
 den ersten nehmen.
 
 `list_applications` liefert je App schon Sync, Health, Images, Revisionen und „deployed vor“. Für

@@ -34,9 +34,10 @@ Chat tippen.
 ## Dubletten abschalten
 
 Wer Desktop-Connectoren mit demselben claude.ai-Konto nutzt, bekommt in Claude Code automatisch die
-synchronisierten Server `claude.ai ESKS` und `claude.ai CGSS`. Dann stehen rund 45 Tools doppelt im Kontext,
-und der synchronisierte Weg trägt den Key in der URL. Deaktiviere die beiden in `/mcp`; das Plugin
-übernimmt.
+synchronisierten Server `claude.ai ESKS` und `claude.ai CGSS`. Claude Code erkennt die Dublette und
+unterdrückt eine der beiden Seiten — welche, ist nicht festgelegt; im Test verlor in Headless-Läufen
+(`claude -p`) das Plugin. Der synchronisierte Weg trägt den Key in der URL. Deaktiviere die beiden in
+`/mcp`, dann nimmt Claude Code sicher das Plugin.
 
 ## CGSS braucht eine Engineer-Rolle
 

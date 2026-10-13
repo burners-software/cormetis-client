@@ -241,7 +241,8 @@ sonst. Danach stehen ESKS und CGSS bereit.
 
 **Hast du die Connectoren auch in Claude Desktop?** Dann tauchen sie in Claude Code noch ein zweites
 Mal auf, als `claude.ai ESKS` und `claude.ai CGSS`. Tippe `/mcp` und deaktiviere diese beiden — sonst
-ist alles doppelt da.
+entscheidet Claude Code selbst, welche Seite es nimmt, und das ist nicht immer die mit dem Key im
+sicheren Speicher.
 
 Key ändern, Speicherort und was bei fehlender Engineer-Rolle passiert:
 [README von `cor-metis-code`](../plugins/cor-metis-code/README.md).

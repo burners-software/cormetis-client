@@ -42,7 +42,7 @@ Vier Fälle, die Verschiedenes bedeuten:
 | Beobachtung | Bedeutung |
 |---|---|
 | ESKS-Tools da (unter einem Präfix) | Connector existiert und ist verbunden → Check 3 |
-| ESKS-Tools unter **zwei** Präfixen (z.B. `mcp__claude_ai_ESKS__…` und `mcp__plugin_cor-metis-code_ESKS__…`) | Dublette, **kein FAIL** → Check 3, aber als Hinweis melden: in Claude Code den synchronisierten Server `claude.ai ESKS` unter `/mcp` deaktivieren. Sonst stehen alle Tools doppelt im Kontext, und der synchronisierte Weg trägt den Key in der URL. |
+| ESKS-Tools unter **zwei** Präfixen (z.B. `mcp__claude_ai_ESKS__…` und `mcp__plugin_cor-metis-code_ESKS__…`) | Dublette, **kein FAIL** → Check 3, aber als Hinweis melden: in Claude Code den synchronisierten Server `claude.ai ESKS` unter `/mcp` deaktivieren. Sonst unterdrückt Claude Code eine Seite nach eigenem Ermessen, und der synchronisierte Weg trägt den Key in der URL. Fehlen die Plugin-Tools, obwohl `cor-metis-code` installiert ist, und nur `mcp__claude_ai_ESKS__…` ist da, ist das dieselbe Ursache, kein Defekt. |
 | Keine ESKS-Tools, aber ein ähnlich benannter Server (`metis`, `cor-metis`, `esks-spike`) | Connector existiert, heißt aber **falsch** → siehe Teil B, Punkt „Name" |
 | Gar nichts dergleichen | Connector fehlt → Teil B |
 
@@ -150,7 +150,7 @@ In Claude Code gibt es keinen Connector zum Abtippen. Das Plugin `cor-metis-code
    Entwickler zusätzlich `/plugin install cor-metis-gitops@cor-metis-client` (die Deploy-Skills).
 3. **Key eingeben**, wenn Claude Code beim Aktivieren von `cor-metis-code` danach fragt. Die Eingabe ist maskiert — der Key gehört dort hinein, **nicht** in den Chat.
 4. Claude Code neu starten, mit `/mcp` prüfen, dass ESKS (und CGSS) verbunden sind.
-5. Nutzt derselbe claude.ai-Account auch Desktop-Connectoren, tauchen sie in Claude Code zusätzlich als `claude.ai ESKS` / `claude.ai CGSS` auf. Die in `/mcp` deaktivieren — sonst Dubletten (Check 2).
+5. Nutzt derselbe claude.ai-Account auch Desktop-Connectoren, tauchen sie in Claude Code zusätzlich als `claude.ai ESKS` / `claude.ai CGSS` auf. Die in `/mcp` deaktivieren — sonst wählt Claude Code selbst, welche Seite es nimmt (Check 2).
 6. Zurückkommen und sagen: *„prüf mal"* → Teil A.
 
 `/mcp` zeigt CGSS als „failed", ESKS aber verbunden → fehlende Engineer-Rolle, siehe Check 6. Für Entwickler ist das der Ausnahmefall.

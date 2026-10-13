@@ -68,8 +68,10 @@ Verbindungsaufbau mit 403 ab.
 | Aufräumen | — | synchronisierte Server `claude.ai ESKS` / `claude.ai CGSS` in `/mcp` deaktivieren |
 
 Der letzte Punkt betrifft jeden, der die Connectoren auch in Desktop hat: Claude Code übernimmt sie
-über das claude.ai-Konto automatisch. Mit `cor-metis-code` stehen die Tools dann doppelt im Kontext,
-und der synchronisierte Weg trägt den Key in der URL.
+über das claude.ai-Konto automatisch. Mit `cor-metis-code` ist ESKS dann zweimal konfiguriert. Claude Code
+erkennt die Dublette und unterdrückt eine Seite — welche, ist nicht festgelegt (im Test 2026-10-13 verlor
+in Headless-Läufen das Plugin). Der synchronisierte Weg trägt den Key in der URL; abschalten stellt sicher,
+dass der Plugin-Weg mit dem Key im Header genommen wird.
 
 Schritt für Schritt für Nutzer: [docs/ONBOARDING.md](docs/ONBOARDING.md). Key-Speicherort und
 Engineer-Rolle in Claude Code: [`plugins/cor-metis-code/README.md`](plugins/cor-metis-code/README.md).
@@ -89,8 +91,10 @@ per `${user_config.api_key}` einsetzen. Das funktioniert nicht überall:
   `cormetis-skills-raw/docs/COR.metis-Deployment-Spec.md`, Abschnitt 2–3.
 - **Claude Desktop (Chat):** wie es auf einen `${user_config.*}`-Header reagiert, ist nicht eindeutig
   dokumentiert.
-- **Claude Code** fragt den Key laut Dokumentation maskiert ab und legt ihn im eigenen
-  Credential-Store ab. Am lebenden Objekt bestätigt ist das noch nicht (siehe „Vor dem Rollout offen“).
+- **Claude Code** fragt den Key beim Installieren maskiert ab und legt ihn im eigenen
+  Credential-Store ab — bestätigt am 2026-10-13 (Claude Code 2.1.296, Linux: `~/.claude/.credentials.json`,
+  Rechte `0600`). Der Key stand danach weder in `~/.claude.json`, `settings.json`, den Debug-Logs noch im
+  Repo.
 
 Deshalb liegt das einzige `.mcp.json` in `cor-metis-code`, einem Plugin ohne Skills, das ausdrücklich
 nur für Claude Code beschrieben ist. `cor-metis` und `cor-metis-gitops` bleiben frei von jeder
@@ -190,8 +194,9 @@ Weiter offen, nicht blockierend:
 
 - [ ] `burner-status`: ob ein **gemappter** Fehlercode ein `label`-Feld mitbringt, ist gegen echte
       Daten unverifiziert.
-- [ ] Claude Code: ob `userConfig` dort funktioniert, ist ungeprüft. Davon hängt `cor-metis-code` ab;
-      geprüft wird beim Live-Test inklusive Key-Leck-Probe (Spec `2026-10-13`, Abschnitt 7).
+- [x] Claude Code: `userConfig` funktioniert. Live-Test 2026-10-13: maskierte Key-Abfrage, ESKS und CGSS
+      über den Bearer-Header verbunden, Key-Leck-Probe ohne Treffer, Skills `deployment-status`,
+      `deploy-and-wait` und `setup` gegen central-1 grün.
 
 ---
 
