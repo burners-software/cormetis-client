@@ -171,7 +171,8 @@ CGSS-Tools fehlen dann ganz bzw. der Server steht in `/mcp` auf „failed“. Te
   Argo-Lesezugang gibt — mit Chris abgestimmt, nicht geheimer als die ESKS-Skills).
 - Folgeänderung außerhalb dieses Repos: Abschnitt „Connecting a client“ im CGSS-README
   (`backend-monorepo`) auf das Plugin verweisen statt auf `claude mcp add … --header "Bearer <key>"` (Key in
-  Shell-History und Klartext in `~/.claude.json`). Eigener Branch dort, Push durch Chris.
+  Shell-History und Klartext in `~/.claude.json`). Direkt auf master, Push durch Claude (Chris,
+  2026-10-13).
 - `docs/ONBOARDING.md`: kurzer Abschnitt „Für Entwickler: Deployments“ (CGSS-Connector) und
   „Claude Code“.
 
