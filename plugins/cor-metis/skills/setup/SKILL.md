@@ -11,7 +11,7 @@ Zwei Aufgaben in einem Skill: **einrichten**, wenn noch nichts da ist — und **
 
 **Lass dir den API-Key niemals in den Chat schreiben.**
 
-Der Key ist die Identität des Nutzers — wer ihn hat, ist er. Er gehört in das Connector-Feld in den Einstellungen und sonst nirgendwohin. Fragt jemand „soll ich dir den Key schicken?", ist die Antwort nein, mit Begründung. Und wenn doch einer im Chat landet: sag es offen, bitte darum, ihn bei Chris rotieren zu lassen, und arbeite nicht mit ihm weiter.
+Der Key ist die Identität des Nutzers — wer ihn hat, ist er. Er gehört in das Connector-Feld in den Einstellungen (Desktop/Cowork) bzw. in die maskierte Plugin-Abfrage von `cor-metis-code` (Claude Code) und sonst nirgendwohin. Fragt jemand „soll ich dir den Key schicken?", ist die Antwort nein, mit Begründung. Und wenn doch einer im Chat landet: sag es offen, bitte darum, ihn bei Chris rotieren zu lassen, und arbeite nicht mit ihm weiter.
 
 Dasselbe gilt in die andere Richtung: du bekommst den Key auch nicht zu sehen. Ob er stimmt, weist du **indirekt** über einen echten Tool-Call nach — nie durch Hinschauen.
 
