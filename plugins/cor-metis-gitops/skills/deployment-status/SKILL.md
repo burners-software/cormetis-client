@@ -24,8 +24,8 @@ Stehen die Tools nur als „deferred“ da, lade sie per ToolSearch mit einer **
 vorhanden. Siehst du dieselben Tools unter zwei Präfixen, ist das eine Dublette; nimm eins davon.
 
 **Fehlen die CGSS-Tools ganz**, fehlt der Connector, oder CGSS hat die Verbindung schon beim Aufbau
-abgelehnt — weil der Key falsch ist oder dem Nutzer die Engineer-Rolle (DEVELOPER, OPERATOR, ADMIN,
-MASTER) fehlt. Das kommt nicht als Tool-Ergebnis, die Tools sind dann einfach nicht da (in Claude
+abgelehnt — weil der Key falsch ist oder dem Nutzer die Engineer-Rolle (DEVELOPER, OPERATOR, ADMIN
+oder MASTER) fehlt. Das kommt nicht als Tool-Ergebnis, die Tools sind dann einfach nicht da (in Claude
 Code steht CGSS in `/mcp` auf „failed“). Nicht herumprobieren, sondern auf den Skill
 **`cor-metis:setup`** verweisen: *„Ich sehe keinen Zugang zu CGSS — entweder ist der Connector nicht
 eingerichtet, oder dein Key hat keine Engineer-Rolle. ‚COR.metis einrichten‘ prüft das.“*

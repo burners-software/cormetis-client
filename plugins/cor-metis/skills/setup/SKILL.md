@@ -111,7 +111,7 @@ Danach **ein** Satz Klartext: was der Nutzer jetzt kann, und was — falls etwas
 
 Nur nötig, wenn Check 2 fehlgeschlagen ist (bzw. Check 6, wenn ein Entwickler den Deploy-Zugang braucht).
 
-**Voraussetzung:** ein persönlicher ESKS-API-Key. Den gibt es bei Chris. Hat der Nutzer keinen, endet der Weg hier — ohne Key gibt es nichts einzurichten, und ein geliehener Key eines Kollegen ist keine Lösung: die Freigabestufe hängt am Key, ein geteilter Key hebelt das ganze Modell aus.
+**Voraussetzung:** ein persönlicher COR.metis-API-Key. Den gibt es bei Chris. Hat der Nutzer keinen, endet der Weg hier — ohne Key gibt es nichts einzurichten, und ein geliehener Key eines Kollegen ist keine Lösung: die Freigabestufe hängt am Key, ein geteilter Key hebelt das ganze Modell aus.
 
 Der Weg hängt von der Oberfläche ab: **B1** für Claude Desktop und Cowork, **B2** für Claude Code. Führe den Nutzer durch die Schritte. Ein Schritt pro Nachricht, wenn er unsicher wirkt; sonst am Stück.
 

@@ -37,7 +37,7 @@ Installation in Claude Code (Marketplace `cor-metis-client`):
 /plugin install cor-metis-gitops@cor-metis-client
 ```
 
-Der Connector muss `CGSS` heißen: Die Skills erkennen die Tools am Servernamen im Tool-Namen: Der Teil zwischen `mcp__` und
+Der Connector muss `CGSS` heißen: Die Skills erkennen die Tools am Servernamen im Tool-Namen. Der Teil zwischen `mcp__` und
 `__<tool>` ist `CGSS` oder endet auf `_CGSS`, Groß-/Kleinschreibung egal.
 
 Anleitung: **[docs/ONBOARDING.md](../../docs/ONBOARDING.md)** im Repo-Root.

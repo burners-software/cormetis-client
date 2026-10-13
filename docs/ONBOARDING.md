@@ -12,13 +12,13 @@ Link zur Quelle. Nicht aus dem Internet, nicht geraten.
 ## Was du brauchst
 
 - **Claude Desktop** (die App, nicht die Website — Plugins laufen nur in der App).
-- **Deinen persönlichen ESKS-API-Key.** Den legt Chris für dich an; du bekommst ihn als
+- **Deinen persönlichen COR.metis-API-Key.** Den legt Chris für dich an; du bekommst ihn als
   Vaultwarden-Link. Er muss nicht schon da sein, wenn du anfängst — Schritt 1 geht auch ohne.
 
 > **Zum Key:** Er ist dein Ausweis. Was du in COR.metis zu sehen bekommst, hängt an ihm — deshalb
 > hat jeder seinen eigenen, und deshalb wird keiner weitergegeben. Auch nicht kurz, auch nicht an
-> Kollegen. Und: **niemals in einen Chat tippen**, weder bei Claude noch woanders. Er gehört in genau
-> ein Feld, und das kommt in Schritt 2.
+> Kollegen. Und: **niemals in einen Chat tippen**, weder bei Claude noch woanders. Er gehört nur in
+> die Connector-Felder (Schritt 2) bzw. in die Abfrage des Plugins in Claude Code.
 
 *ESKS steht für „Expert System Knowledge Service" — der Dienst, der die Daten bereitstellt.*
 
@@ -34,8 +34,12 @@ Link zur Quelle. Nicht aus dem Internet, nicht geraten.
    https://github.com/burners-software/cormetis-client
    ```
 
-4. Jetzt erscheint der Marketplace mit einem Eintrag. In der Übersicht heißt er **„Cor metis"** —
-   das ist das Richtige, auch wenn im Repo überall `cor-metis` steht. **Hinzufügen.**
+4. Jetzt erscheint der Marketplace mit drei Einträgen. Füge **„Cor metis"** hinzu — das ist das
+   Richtige, auch wenn im Repo überall `cor-metis` steht. **Hinzufügen.**
+   - Der Eintrag mit **„code"** im Namen ist nur für Claude Code und wird in Desktop **nicht**
+     hinzugefügt.
+   - Der Eintrag mit **„gitops"** ist nur für Entwickler — siehe
+     [Für Entwickler](#für-entwickler-deployments-im-blick) weiter unten.
 
 ---
 
@@ -47,7 +51,7 @@ Das ist der einzige Schritt, der etwas Sorgfalt braucht. Danach nie wieder.
 2. **„Connector hinzufügen" → „Benutzerdefinierter Connector".**
 3. **Name:** `ESKS`
 
-   > ⚠️ **Genau so, am besten in Großbuchstaben.** Nicht „COR.metis", nicht „Metis". Der Name ist
+   > ⚠️ **Am besten in Großbuchstaben.** Nicht „COR.metis", nicht „Metis". Der Name ist
    > die Adresse, unter der COR.metis den Zugang später sucht — stimmt er nicht, ist alles verbunden
    > und trotzdem funktioniert nichts. Das ist mit Abstand der häufigste Stolperstein.
 
@@ -164,7 +168,7 @@ welcher Stelle es hakt. Zur Einordnung:
 | Zeitüberschreitung, „Server nicht erreichbar" | Du bist nicht im Firmennetz / nicht im VPN |
 | „Dein Zugang hat keine interne Freigabe" | Kein Fehler. Anlagen-Livedaten sind intern; die Dokumentensuche funktioniert weiter |
 | Ingest bricht beim Bild-Upload ab | Die drei Schalter oben — und danach eine **neue** Session |
-| Ich finde das Plugin im Marketplace nicht | In der Übersicht heißt es **„Cor metis"**, nicht `cor-metis` |
+| Ich finde das Plugin im Marketplace nicht, oder es stehen drei Einträge da | Hinzufügen: **„Cor metis"** (nicht `cor-metis`). Der Eintrag mit „code" ist nur für Claude Code, „gitops" nur für Entwickler |
 
 Hilft das nicht weiter: bei Chris melden, am besten mit der wörtlichen Fehlermeldung.
 
@@ -188,7 +192,7 @@ Mit dem Plugin **`cor-metis-gitops`** fragst du Claude, was auf unseren Umgebung
 Argo CD aufzumachen. Claude liest dabei nur mit; ausrollen, synchronisieren oder etwas ändern kann es
 nicht.
 
-Dafür brauchst du eine **Engineer-Rolle** (DEVELOPER oder OPERATOR; ADMIN und MASTER gehen auch).
+Dafür brauchst du eine **Engineer-Rolle** (DEVELOPER, OPERATOR, ADMIN oder MASTER).
 Ob du eine hast, weiß Chris.
 
 1. **Einstellungen → Plugins**, im Marketplace von Schritt 1 zusätzlich **`cor-metis-gitops`**

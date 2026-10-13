@@ -184,7 +184,7 @@ Aus der Deployment-Spec, Abschnitt 7 — serverseitig, blockierend:
       an den Trace.
 - [ ] **Keys URL-safe erzeugen** (base64url oder Hex) — `+`, `/`, `=` zerlegen den Query-String.
 - [ ] **Keys pro Person, widerrufbar.** Ein geteilter Key hebelt das Clearance-Modell aus.
-- [ ] **MCP-Endpoint-Pfad bestätigen.** `/esks/mcp` ist aus `/esks/health` abgeleitet, nicht verifiziert.
+- [x] **MCP-Endpoint-Pfad bestätigen.** Erledigt (2026-10-13): `/esks/mcp` und `/cgss/mcp` laufen live auf central-1.
 
 Weiter offen, nicht blockierend:
 

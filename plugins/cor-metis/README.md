@@ -1,6 +1,6 @@
 # cor-metis
 
-Das Wissens-Orakel der COR Energy World GmbH für Claude Desktop.
+Das Wissens-Orakel der COR Energy World GmbH für Claude Desktop und Claude Code.
 
 ## Was drin ist
 
@@ -16,10 +16,12 @@ Die Skills triggern von selbst. Man muss sie nicht aufrufen, sondern einfach fra
 ## Voraussetzung
 
 Das Plugin bringt **keinen** Connector mit. Jeder Nutzer richtet den ESKS-Zugang einmalig mit
-seinem persönlichen API-Key ein — er ist die Identität, an der die Freigabestufe hängt.
+seinem persönlichen COR.metis-API-Key ein — er ist die Identität, an der die Freigabestufe hängt.
 
 - **Claude Desktop / Cowork:** benutzerdefinierter Connector namens `ESKS` mit dem Key in der URL.
-- **Claude Code:** zusätzlich das Plugin `cor-metis-code` installieren
+- **Claude Code:** das Plugin selbst mit
+  `/plugin install cor-metis@cor-metis-client` installieren (nach
+  `/plugin marketplace add burners-software/cormetis-client`), dazu das Plugin `cor-metis-code` installieren
   (`/plugin install cor-metis-code@cor-metis-client`). Es bringt die Server ESKS und CGSS mit und
   fragt den Key beim Aktivieren maskiert ab. Wer dieselben Connectoren auch in Desktop hat, deaktiviert
   in Claude Code unter `/mcp` die synchronisierten Server `claude.ai ESKS` / `claude.ai CGSS`, sonst

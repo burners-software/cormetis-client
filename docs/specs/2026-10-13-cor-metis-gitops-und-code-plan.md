@@ -1,5 +1,7 @@
 # cor-metis-gitops und cor-metis-code — Umsetzungsplan
 
+> **Historisch:** maßgeblich ist die Spec; die Präfixregel wurde nach dem Plan präzisiert (Spec §4).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or
 > superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for
 > tracking.

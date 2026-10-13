@@ -14,7 +14,7 @@
     {
       "name": "cor-metis-gitops",
       "version": "0.1.0",
-      "description": "COR.metis Gitops — Deployment-Status, Warten auf Rollouts und Diagnose über CGSS (für Entwickler)",
+      "description": "COR.metis GitOps — Deployment-Status, Warten auf einen Rollout und Diagnose über Argo CD und Nexus (read-only, für Entwickler)",
       "source": "./plugins/cor-metis-gitops"
     },
     {

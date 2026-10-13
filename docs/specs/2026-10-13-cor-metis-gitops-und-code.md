@@ -20,7 +20,7 @@ an CGSS oder ESKS, kein OAuth.
 | Plugin | Inhalt | Desktop/Cowork | Claude Code | Wer installiert |
 |---|---|---|---|---|
 | `cor-metis` | Skills `orakel`, `burner-status`, `ingest`, `setup` | ja | ja | alle |
-| `cor-metis-gitops` (neu) | Skills `deployment-status`, `deploy-and-wait`, `diagnose` | ja | ja | Entwickler (DEVELOPER/OPERATOR) |
+| `cor-metis-gitops` (neu) | Skills `deployment-status`, `deploy-and-wait`, `diagnose` | ja | ja | Entwickler (DEVELOPER/OPERATOR, ADMIN, MASTER) |
 | `cor-metis-code` (neu) | **keine Skills**, nur `.mcp.json` für ESKS und CGSS plus `userConfig` für den Key | nein | ja | Entwickler in Claude Code |
 
 `cor-metis-code` bringt CGSS mit. Ohne Engineer-Rolle lehnt CGSS schon den Verbindungsaufbau mit 403 ab und
@@ -47,7 +47,7 @@ und laufen überall gleich.
 | `CGSS` | `https://internal.cor.energy/cgss/mcp?apikey=DEIN_KEY` |
 
 Derselbe persönliche Key für beide. CGSS verlangt zusätzlich eine Engineer-Rolle (DEVELOPER, OPERATOR,
-ADMIN, MASTER); ohne sie antwortet CGSS mit 403.
+ADMIN oder MASTER); ohne sie antwortet CGSS mit 403.
 
 Voraussetzung für `?apikey=` auf `/cgss`: der Query-String wird nicht geloggt. Laut Felix (2026-10-13)
 protokolliert Envoy für alle Pfade `%PATH(NQ)%`, nginx loggt keine Query-Parameter mehr, und das
