@@ -9,12 +9,12 @@ Jemand hat einen Commit ins GitOps-Repo gepusht und will wissen, wann er läuft 
 Du bestimmst, **worauf** gewartet wird, wartest geduldig und knapp, und meldest das Ergebnis.
 
 Du **pushst nicht** und **löst keinen Sync aus**. CGSS ist read-only, `wait_for_revision` schaut nur
-zu. Ist der Commit noch nicht gepusht, sagst du das und wartest, bis der Nutzer es getan hat.
+zu. Ist der Commit noch nicht gepusht, sagst du das und hörst auf; nach dem Push setzt du neu an.
 
 ## Die CGSS-Tools finden
 
-Maßgeblich ist **das Segment unmittelbar vor `__<tool>`: es heißt `CGSS`, Groß-/Kleinschreibung
-egal** — z.B. `mcp__CGSS__wait_for_revision` (Desktop/Cowork), `mcp__claude_ai_CGSS__wait_for_revision`
+**Der Teil zwischen `mcp__` und `__<tool>` ist `CGSS` oder endet auf `_CGSS`, Groß-/Kleinschreibung egal.**
+Beispiele: `mcp__CGSS__wait_for_revision` (Desktop/Cowork), `mcp__claude_ai_CGSS__wait_for_revision`
 (Claude Code, synchronisierter Connector), `mcp__plugin_cor-metis-code_CGSS__wait_for_revision`
 (Plugin `cor-metis-code`), `mcp__cgss__wait_for_revision` (von Hand angelegt). Deferred → per
 ToolSearch-Stichwortsuche „CGSS wait_for_revision“ nachladen, nie per `select:` mit festem Namen.
@@ -38,8 +38,8 @@ diesen Tag einträgt.
    Verzeichnisse auf Applications abbilden (`apps/<name>.yaml` deklariert die Application, die
    Werte liegen in einem eigenen Verzeichnis).
 2. **Ist `HEAD` gepusht?** `git status -sb` (kein `ahead`) und `git branch -r --contains HEAD`
-   (enthält den Remote-Branch des Clusters). Nicht gepusht → sagen und aufhören. **Nicht selbst
-   pushen**, auch nicht auf Nachfrage im Vorbeigehen; der Nutzer pusht.
+   (enthält den Remote-Branch des Clusters). Nicht gepusht → sagen und aufhören; nach dem Push
+   neu ansetzen. **Nicht selbst pushen**, auch nicht auf Nachfrage im Vorbeigehen; der Nutzer pusht.
 3. **Revision:** `git rev-parse HEAD`.
 4. **Environment:** aus dem Branch (Cluster) ableiten und gegen `list_environments` prüfen. Steht
    das Environment dort nicht, ist es an CGSS nicht angebunden (heute nur `central-1`; dev01 und
@@ -71,10 +71,11 @@ Ein Image-Tag oder ein Code-Commit ist keine Antwort auf die SHA-Frage; erklär 
   Runde; das Interessante kommt am Ende.
 - **`pending` mit `last_error`**: Argo war bei der letzten Abfrage nicht erreichbar
   (`upstream_unavailable`). Das ist kein Abbruchgrund, aber nenn es in der Zeile mit.
-- **Abbruch nach etwa 10 Minuten** `pending` (rund 24 Aufrufe). Dann den letzten `observed`-Stand
-  melden und sagen, woran es hängt, so weit `observed` das hergibt. Kein stilles Weiterwarten.
-- Mehrere Applications: je App eine eigene Schleife, abwechselnd aufrufen, Ergebnisse getrennt
-  melden.
+- **Abbruch nach etwa 10 Minuten insgesamt** (bei einer App rund 24 Aufrufe). Dann den letzten
+  `observed`-Stand melden und sagen, woran es hängt, so weit `observed` das hergibt. Kein stilles
+  Weiterwarten.
+- **Mehrere Applications: reihum warten**, je Runde ein Aufruf pro App, die noch `pending` ist.
+  Die 10 Minuten gelten für alle zusammen, nicht je App. Ergebnisse je App getrennt melden.
 
 ### Die beobachtete Revision ist eine andere
 
@@ -83,12 +84,19 @@ aufgelösten HEAD des Ziel-Branches. Landet nach dem Push noch ein Commit (von j
 ein zweiter eigener), wird die angefragte SHA nie `reached`, obwohl sie längst drin ist. Vergleich
 deshalb bei `pending` `observed.revisions` mit der angefragten Revision:
 
-- **Claude Code:** `git fetch`, dann `git merge-base --is-ancestor <angefragt> <beobachtet>`.
-  Exit 0 → der Commit ist in der beobachteten Revision enthalten: **auf die beobachtete Revision
-  weiterwarten** und das sagen (*„Argo steht schon auf `abc1234`, das deinen Commit enthält — ich
-  warte darauf.“*). Ist die beobachtete Revision ein **Vorgänger** der angefragten, hat Argo den
-  Commit nur noch nicht abgeholt — normal weiterwarten. Weder noch → Branch oder App passen nicht;
-  melden und aufhören.
+- **Claude Code:** `git fetch`, dann `git merge-base --is-ancestor <angefragt> <beobachtet>`. Hat die
+  App mehrere Quellen, steht in `observed.revisions` eine Revision je Quelle — gegen **jede** prüfen;
+  maßgeblich ist die des GitOps-Repos (Revisionen anderer Quellen, z.B. Chart-Versionen, kennt Git
+  nicht und liefern 128).
+  - **Exit 0** → der Commit ist in der beobachteten Revision enthalten: **auf die beobachtete
+    Revision weiterwarten** und das sagen (*„Argo steht schon auf `abc1234`, das deinen Commit
+    enthält — ich warte darauf.“*).
+  - **Exit 1** → kein Vorfahre. Prüf umgekehrt (`--is-ancestor <beobachtet> <angefragt>`): Exit 0
+    dort heißt, Argo hat den Commit nur noch nicht abgeholt — normal weiterwarten. Sonst passen
+    Branch oder App nicht; melden und aufhören.
+  - **Exit 128** → ein Commit fehlt lokal; das ist keine Antwort. Erst richtig fetchen
+    (`git fetch origin <cluster-branch>`), dann erneut prüfen. Bleibt es bei 128, die abweichende
+    Revision melden und fragen.
 - **Desktop:** die abweichende Revision nennen und fragen, ob sie den Commit enthält oder ob
   weitergewartet werden soll.
 
@@ -124,6 +132,12 @@ Aufruf; kein späterer kann das Ergebnis ändern.
   Health-Meldung) und die `unhealthy_resources` aus der Antwort. Den Diagnose-Ablauf **nicht hier
   nachbauen**. Ist `unhealthy_resources` `null` mit `unhealthy_resources_error`, heißt das
   „unbekannt“, nicht „keine“ — so weitergeben.
+
+  **Fallback:** Ist `cor-metis-gitops:diagnose` nicht verfügbar oder heißt anders (auf claude.ai
+  erscheinen Skills z.B. als `anthropic-skills:<name>` — dann den dortigen `diagnose` nehmen), und
+  findest du ihn nicht, diagnostiziere knapp selbst: `get_application_events` ohne `resource_name`,
+  bei Neustarts `get_application_logs` mit `previous: true`, danach Ursache, Belege (wörtliche
+  Zitate) und nächster Schritt — und dass ein Fix nicht von hier aus geht.
 - **Abbruch nach ~10 min `pending`:** letzter `observed`-Stand, eine Einschätzung (Pods starten
   noch? Sync hängt? nie abgeholt?) und das Angebot, später erneut zu warten oder mit `diagnose`
   nachzusehen.
@@ -131,12 +145,12 @@ Aufruf; kein späterer kann das Ergebnis ändern.
 ## Gotchas
 
 - Revision = GitOps-Commit. Nie den Code-Commit, nie den Image-Tag an `wait_for_revision` geben.
-- Nie pushen, nie einen Sync auslösen. Nicht gepusht → sagen und warten, bis der Nutzer pusht.
+- Nie pushen, nie einen Sync auslösen. Nicht gepusht → sagen und aufhören, nach dem Push neu ansetzen.
 - Nur auf `pending` erneut aufrufen; jedes `error` beendet sofort.
 - `timeout_seconds` 25, Abbruch nach ~10 Minuten. Eine Zeile pro Runde, nicht mehr.
 - Präfixvergleich, keine Abstammung: abweichende beobachtete Revision prüfen
   (`git merge-base --is-ancestor`), bevor du bis zum Timeout wartest.
 - `OutOfSync` ohne laufende Operation über zwei Aufrufe → „vermutlich kein Auto-Sync“, melden.
-- Ein Commit kann mehrere Apps treffen — je App warten, getrennt berichten.
+- Ein Commit kann mehrere Apps treffen — reihum warten, 10 Minuten insgesamt, getrennt berichten.
 - Environment nicht in `list_environments` → nicht angebunden; nicht raten.
 - `failed` → `cor-metis-gitops:diagnose`, nicht selbst diagnostizieren.

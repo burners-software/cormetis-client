@@ -11,8 +11,8 @@ statt einen Fix anzudeuten, den es von hier aus nicht gibt.
 
 ## Die CGSS-Tools finden
 
-Maßgeblich ist **das Segment unmittelbar vor `__<tool>`: es heißt `CGSS`, Groß-/Kleinschreibung
-egal** — z.B. `mcp__CGSS__get_application_status` (Desktop/Cowork),
+**Der Teil zwischen `mcp__` und `__<tool>` ist `CGSS` oder endet auf `_CGSS`, Groß-/Kleinschreibung egal.**
+Beispiele: `mcp__CGSS__get_application_status` (Desktop/Cowork),
 `mcp__claude_ai_CGSS__get_application_status` (Claude Code, synchronisierter Connector),
 `mcp__plugin_cor-metis-code_CGSS__get_application_status` (Plugin `cor-metis-code`),
 `mcp__cgss__get_application_status` (von Hand angelegt). Deferred → per ToolSearch-Stichwortsuche
@@ -74,9 +74,14 @@ versuchen und mit Status und Events weiterarbeiten.
 
 **4. Was hat sich geändert? — `get_deploy_history(environment, application)`.** Wenn das Problem mit
 einem Deploy zusammenfallen könnte: wann der letzte Deploy war, welche Revision davor lief. Passt der
-Zeitpunkt des Problems zum letzten Deploy, ist die Änderung der erste Verdächtige. Ob dabei das Image
-gewechselt hat, siehst du an `images` im Status; die Historie selbst führt GitOps-Revisionen, keine
-Tags, und nur die letzten ~10.
+Zeitpunkt des Problems zum letzten Deploy, ist die Änderung der erste Verdächtige. Die Historie führt
+GitOps-Revisionen, keine Tags, und nur die letzten ~10. `images` im Status zeigt nur die **aktuellen**
+Images, nicht die früheren. Für „hat sich das Image (oder die Konfiguration) geändert?“:
+
+- **Claude Code:** im GitOps-Repo `git diff <vorige Revision> <aktuelle Revision>` — beide aus
+  `get_deploy_history` (ggf. vorher `git fetch`). Der Diff zeigt Tag-Wechsel und
+  Konfigurationsänderungen gleichermaßen.
+- **Desktop:** nachfragen, was mit dem letzten Deploy geändert wurde.
 
 ## Teilergebnisse und Fehler
 

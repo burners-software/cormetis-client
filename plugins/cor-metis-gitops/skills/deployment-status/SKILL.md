@@ -11,9 +11,8 @@ read-only. Wer etwas ändern will, tut das selbst über das GitOps-Repo oder die
 
 ## Die CGSS-Tools finden
 
-Derselbe Server erscheint je nach Oberfläche unter verschiedenen Präfixen. Maßgeblich ist **das
-Segment unmittelbar vor `__<tool>`: es heißt `CGSS`, Groß-/Kleinschreibung egal.** Beispiele für
-`list_environments`:
+Derselbe Server erscheint je nach Oberfläche unter verschiedenen Präfixen. Maßgeblich ist der Servername im Tool-Namen:
+**Der Teil zwischen `mcp__` und `__<tool>` ist `CGSS` oder endet auf `_CGSS`, Groß-/Kleinschreibung egal.** Beispiele für `list_environments`:
 
 - `mcp__CGSS__list_environments` (Claude Desktop / Cowork, Connector `CGSS`)
 - `mcp__claude_ai_CGSS__list_environments` (Claude Code, synchronisierter claude.ai-Connector)
@@ -33,7 +32,8 @@ eingerichtet, oder dein Key hat keine Engineer-Rolle. ‚COR.metis einrichten‘
 
 ## Environments nie raten
 
-Jedes Tool außer `list_environments` und `search_images` braucht einen Environment-Namen.
+Die Tools je Application brauchen einen Environment-Namen; bei `list_applications` ist er
+optional (weggelassen = alle Environments), `list_environments` und `search_images` kennen keinen.
 **Ruf zuerst `list_environments` auf** und nimm die Namen von dort. Heute ist nur `central-1`
 angebunden; dev01 und dev02 folgen. Fragt jemand nach einem Environment, das nicht in der Liste
 steht, heißt das „ist an CGSS nicht angebunden“, nicht „gibt es nicht“. Produktion ist hier
@@ -81,7 +81,7 @@ nicht (`knowledge` → 0 Treffer). CGSS fragt Nexus per Stichwortsuche (`q`) und
 auf den Teilstring — was Nexus' Stichwortsuche nicht liefert, kann CGSS nicht finden. Deshalb:
 
 - Mit dem **vollen Image-Namen** aus dem Status suchen — der Teil zwischen Registry-Host und `:`,
-  ohne Tag; bei einem Pfad zuerst das letzte Segment (`expertsystemknowledgeservice`).
+  ohne Tag; bei einem Pfad zuerst der letzte Pfadteil (`expertsystemknowledgeservice`).
 - **0 Treffer bei einem Namensteil heißen nicht „gibt es nicht“.** Mit dem vollen Namen erneut
   suchen, bevor du etwas behauptest.
 - `version` engt auf einen Tag-Anfang ein (`1.0`, `1.0.2`) — hilft auch, wenn `truncated` gesetzt ist.
