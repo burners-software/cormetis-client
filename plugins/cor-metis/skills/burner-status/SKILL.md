@@ -16,8 +16,8 @@ Zwei Werkzeuge, eine Aufgabe:
 Beide sind **read-only**. Du kannst von hier aus nichts an einer Anlage verändern. Und es gibt
 **keine Historie** — du siehst diesen Moment, sonst nichts.
 
-> Technisch heißen die Calls in der aktuellen Instanz `mcp__ESKS__find_burner` und
-> `mcp__ESKS__get_burner_status`. Beide haben genau einen Parameter (`query` bzw. `serial_number`)
+> Technisch sind das `find_burner` und `get_burner_status` vom ESKS-Server (wie man sie findet,
+> steht im Preflight). Beide haben genau einen Parameter (`query` bzw. `serial_number`)
 > und keinen Clearance-Parameter, weil es keinen braucht: die Prüfung hängt am API-Key des
 > Fragenden und passiert serverseitig.
 
@@ -34,7 +34,9 @@ die dein Gegenüber benutzt hat, statt sie zu korrigieren.
 
 ## Preflight — ist ESKS überhaupt verbunden?
 
-Sind die `mcp__ESKS__*`-Tools nicht verfügbar (auch nicht als „deferred" nachladbar), fehlt dem Nutzer der Connector. Das ist etwas völlig anderes als eine abgelehnte Berechtigung — und muss auch anders klingen:
+Die Tools heißen je nach Oberfläche verschieden, z.B. `mcp__ESKS__find_burner` (Claude Desktop), `mcp__claude_ai_ESKS__find_burner` (Claude Code, synchronisierter Connector) oder `mcp__plugin_cor-metis-code_ESKS__find_burner` (Claude Code, Plugin `cor-metis-code`). Ein Tool gehört zum ESKS-Server, wenn der Teil zwischen `mcp__` und `__<tool>` `ESKS` ist oder auf `_ESKS` endet — Groß-/Kleinschreibung egal. Sind sie als „deferred" gelistet, lade sie per ToolSearch-Stichwortsuche nach („ESKS find_burner“) — nie per `select:` mit festem Namen, der stimmt nur auf einer Oberfläche.
+
+Sind die ESKS-Tools nicht verfügbar (auch nicht als „deferred" nachladbar), fehlt dem Nutzer der Connector. Das ist etwas völlig anderes als eine abgelehnte Berechtigung — und muss auch anders klingen:
 
 > „Der ESKS-Connector ist bei dir nicht eingerichtet — ohne den sehe ich keine Anlage. Sag ‚COR.metis einrichten', dann führe ich dich durch."
 

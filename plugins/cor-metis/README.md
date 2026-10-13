@@ -18,6 +18,16 @@ Die Skills triggern von selbst. Man muss sie nicht aufrufen, sondern einfach fra
 Das Plugin bringt **keinen** Connector mit. Jeder Nutzer richtet den ESKS-Zugang einmalig mit
 seinem persönlichen API-Key ein — er ist die Identität, an der die Freigabestufe hängt.
 
+- **Claude Desktop / Cowork:** benutzerdefinierter Connector namens `ESKS` mit dem Key in der URL.
+- **Claude Code:** zusätzlich das Plugin `cor-metis-code` installieren
+  (`/plugin install cor-metis-code@cor-metis-client`). Es bringt die Server ESKS und CGSS mit und
+  fragt den Key beim Aktivieren maskiert ab. Wer dieselben Connectoren auch in Desktop hat, deaktiviert
+  in Claude Code unter `/mcp` die synchronisierten Server `claude.ai ESKS` / `claude.ai CGSS`, sonst
+  stehen alle Tools doppelt da.
+
+Die Skills finden die ESKS-Tools unter jedem dieser Wege: maßgeblich ist der Server-Name `ESKS`
+im Tool-Namen, nicht der Präfix davor.
+
 Anleitung: **[docs/ONBOARDING.md](../../docs/ONBOARDING.md)** im Repo-Root.
 Oder direkt in Claude: *„COR.metis einrichten"*.
 
