@@ -1,7 +1,8 @@
 # cor-metis-gitops
 
 Deployment-Status, Rollout-Beobachtung und Diagnose für die Dienste der COR Energy World GmbH —
-über Argo CD und Nexus, read-only. Für Entwicklerinnen und Entwickler, in Claude Desktop, Cowork und
+über Argo CD und Nexus, read-only — und der Blick direkt auf die Geräte (Container und Logs über
+das NetBird-Mesh). Für Entwicklerinnen und Entwickler, in Claude Desktop, Cowork und
 Claude Code.
 
 ## Was drin ist
@@ -11,10 +12,11 @@ Claude Code.
 | `deployment-status` | `cor-metis-gitops:deployment-status` | Was läuft wo: Version/Image, Sync, Health, seit wann, Umgebungsvergleich, neuere Images in Nexus |
 | `deploy-and-wait` | `cor-metis-gitops:deploy-and-wait` | Wartet, bis ein gepushter GitOps-Commit ausgerollt ist, und übergibt bei Fehlschlag an `diagnose` |
 | `diagnose` | `cor-metis-gitops:diagnose` | Warum ist eine App degraded, startet neu oder scheitert beim Sync — Ursache, Belege, nächster Schritt |
+| `device-diagnose` | `cor-metis-gitops:device-diagnose` | Direkt am Gerät (HMI, Raspi im NetBird-Mesh): Container, Logs, Anlagenstatus aus ESKS und die Cloud-Gegenseite — warum eine Anlage steht oder die Cloud-Verbindung hakt |
 
 Die Skills triggern von selbst. Man muss sie nicht aufrufen, sondern einfach fragen:
 *„Welche Version hat ESKS auf central?“*, *„Ich hab gepusht, sag Bescheid, wenn’s läuft.“*,
-*„Warum startet CGSS dauernd neu?“*
+*„Warum startet CGSS dauernd neu?“*, *„Laufen auf der cor-x00012 alle Container?“*
 
 ## Voraussetzung
 
@@ -46,10 +48,10 @@ Oder direkt in Claude: *„COR.metis einrichten“* (Skill `cor-metis:setup` pr�
 ## Read-only
 
 Kein Skill löst einen Sync, Rollback oder Restart aus, und keiner pusht. CGSS kann das auch gar
-nicht: Jeder Zugriff auf Argo CD und Nexus ist ein lesender. Änderungen laufen wie bisher über das
+nicht: Jeder Zugriff auf Argo CD, Nexus und die Geräte ist ein lesender. Änderungen laufen wie bisher über das
 GitOps-Repo und Argo CD — durch dich.
 
-Angebunden ist heute `central-1`; dev01 und dev02 folgen. Produktion ist nicht lesbar.
+Angebunden sind heute `central-1`, `dev01` und `dev02`. Produktion ist nicht lesbar.
 
 ## Lizenz
 

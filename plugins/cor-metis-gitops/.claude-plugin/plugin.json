@@ -1,7 +1,7 @@
 {
   "name": "cor-metis-gitops",
-  "version": "0.1.1",
-  "description": "COR.metis GitOps — Deployment-Status, Warten auf einen Rollout und Diagnose über Argo CD und Nexus (read-only, für Entwickler)",
+  "version": "0.2.0",
+  "description": "COR.metis GitOps — Deployment-Status, Warten auf einen Rollout, Diagnose über Argo CD und Nexus und Diagnose direkt am Gerät (read-only, für Entwickler)",
   "author": {
     "name": "COR Energy World GmbH",
     "url": "https://cor.energy"
@@ -14,6 +14,7 @@
     "metis",
     "gitops",
     "argocd",
-    "cgss"
+    "cgss",
+    "devices"
   ]
 }

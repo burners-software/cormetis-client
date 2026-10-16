@@ -24,8 +24,8 @@ abgelehnt (falscher Key oder keine Engineer-Rolle; in Claude Code steht CGSS in 
 
 ## Environment und App
 
-Environment-Namen aus `list_environments`, nie geraten. Heute ist nur `central-1` angebunden;
-dev01 und dev02 folgen. Fehlt ein Environment dort, ist es nicht angebunden — nicht „gibt es
+Environment-Namen aus `list_environments`, nie geraten. Heute sind `central-1`, `dev01` und
+`dev02` angebunden. Fehlt ein Environment dort, ist es nicht angebunden — nicht „gibt es
 nicht“. Den exakten App-Namen bei Bedarf über `list_applications` mit `name_contains`.
 
 Kommst du aus `cor-metis-gitops:deploy-and-wait`, hast du Environment, App, Revision und die

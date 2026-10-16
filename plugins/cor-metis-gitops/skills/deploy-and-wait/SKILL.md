@@ -42,8 +42,8 @@ diesen Tag einträgt.
    neu ansetzen. **Nicht selbst pushen**, auch nicht auf Nachfrage im Vorbeigehen; der Nutzer pusht.
 3. **Revision:** `git rev-parse HEAD`.
 4. **Environment:** aus dem Branch (Cluster) ableiten und gegen `list_environments` prüfen. Steht
-   das Environment dort nicht, ist es an CGSS nicht angebunden (heute nur `central-1`; dev01 und
-   dev02 folgen) — dann kannst du nicht warten, sag das.
+   das Environment dort nicht, ist es an CGSS nicht angebunden (heute `central-1`, `dev01` und
+   `dev02`) — dann kannst du nicht warten, sag das.
 5. **Applications:** aus den geänderten Pfaden. `git show --name-only --format= HEAD`; hat der Nutzer
    mehrere Commits auf einmal gepusht, die Pfade seit dem Stand, den Argo gerade zeigt. Pfade über
    die Application-Manifeste den Application-Namen zuordnen und mit `list_applications`

@@ -86,7 +86,7 @@ CGSS-Tools erkennst du nach derselben Regel wie in Check 2: der Teil zwischen `m
 
 Ruf `list_environments` vom CGSS-Server auf:
 
-- **Liste kommt** → PASS. Nenne die Environments, die tatsächlich zurückkommen — nur diese, keine aus der Erinnerung ergänzen (heute meist nur `central-1`; `dev01`/`dev02` erscheinen erst, wenn sie angebunden sind).
+- **Liste kommt** → PASS. Nenne die Environments, die tatsächlich zurückkommen — nur diese, keine aus der Erinnerung ergänzen (heute `central-1`, `dev01` und `dev02`).
 - **CGSS-Tools fehlen, obwohl eingerichtet**, bzw. in Claude Code zeigt `/mcp` den Server CGSS als „failed" → entweder ist der Key falsch, **oder** dem Nutzer fehlt eine Engineer-Rolle (DEVELOPER, OPERATOR, ADMIN oder MASTER, oder `*`). CGSS lehnt ohne Rolle schon den Verbindungsaufbau mit 403 ab, deshalb tauchen die Tools gar nicht erst auf. Funktioniert ESKS mit demselben Key (Check 3 grün), ist es fast sicher die Rolle → bei Chris anfragen.
 - **Noch nicht eingerichtet** → Teil B1 (zweiter Connector `CGSS`) bzw. B2 (`cor-metis-code` bringt CGSS mit).
 

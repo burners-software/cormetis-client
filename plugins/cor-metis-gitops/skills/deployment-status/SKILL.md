@@ -34,8 +34,8 @@ eingerichtet, oder dein Key hat keine Engineer-Rolle. ‚COR.metis einrichten‘
 
 Die Tools je Application brauchen einen Environment-Namen; bei `list_applications` ist er
 optional (weggelassen = alle Environments), `list_environments` und `search_images` kennen keinen.
-**Ruf zuerst `list_environments` auf** und nimm die Namen von dort. Heute ist nur `central-1`
-angebunden; dev01 und dev02 folgen. Fragt jemand nach einem Environment, das nicht in der Liste
+**Ruf zuerst `list_environments` auf** und nimm die Namen von dort. Heute sind `central-1`, `dev01`
+und `dev02` angebunden. Fragt jemand nach einem Environment, das nicht in der Liste
 steht, heißt das „ist an CGSS nicht angebunden“, nicht „gibt es nicht“. Produktion ist hier
 grundsätzlich nicht lesbar.
 
