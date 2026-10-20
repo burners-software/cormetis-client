@@ -12,7 +12,7 @@ Claude Code.
 | `deployment-status` | `cor-metis-gitops:deployment-status` | Was läuft wo: Version/Image, Sync, Health, seit wann, Umgebungsvergleich, neuere Images in Nexus |
 | `deploy-and-wait` | `cor-metis-gitops:deploy-and-wait` | Wartet, bis ein gepushter GitOps-Commit ausgerollt ist, und übergibt bei Fehlschlag an `diagnose` |
 | `diagnose` | `cor-metis-gitops:diagnose` | Warum ist eine App degraded, startet neu oder scheitert beim Sync — Ursache, Belege, nächster Schritt |
-| `device-diagnose` | `cor-metis-gitops:device-diagnose` | Direkt am Gerät (HMI, Raspi im NetBird-Mesh): Container, Logs, Anlagenstatus aus ESKS und die Cloud-Gegenseite — warum eine Anlage steht oder die Cloud-Verbindung hakt |
+| `device-diagnose` | `cor-metis-gitops:device-diagnose` | Direkt am Gerät (HMI, Raspi im NetBird-Mesh): Container, k3s-Pods, Logs auch weit zurück, Anlagenstatus aus ESKS und die Cloud-Gegenseite — warum eine Anlage steht oder die Cloud-Verbindung hakt |
 
 Die Skills triggern von selbst. Man muss sie nicht aufrufen, sondern einfach fragen:
 *„Welche Version hat ESKS auf central?“*, *„Ich hab gepusht, sag Bescheid, wenn’s läuft.“*,
