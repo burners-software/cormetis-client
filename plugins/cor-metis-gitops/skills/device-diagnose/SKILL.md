@@ -13,7 +13,8 @@ kein Deploy, kein Befehl am Gerät. Die Tools können das auch nicht. Das sagst 
 
 Zwei Server, dieselbe Regel: Der Teil zwischen `mcp__` und `__<tool>` ist `CGSS` bzw. `ESKS` oder
 endet auf `_CGSS` bzw. `_ESKS`, Groß-/Kleinschreibung egal. Deferred → per ToolSearch-Stichwortsuche
-nachladen („CGSS get_device_logs“, „ESKS find_burner“), nie per `select:` mit festem Namen.
+nachladen („CGSS get_device_logs“, „ESKS find_burner“), nie per `select:` mit festem Namen. Treffer mit
+anderem Servernamen (etwa `…cgss_test__…`) sind Test-Connectoren und bleiben liegen.
 
 - **CGSS:** `list_devices`, `get_device_containers`, `get_device_logs`, `get_device_pod_logs`, dazu die Argo-Tools
   (`list_environments`, `list_applications`, `get_application_status`, `get_application_logs`).
@@ -55,7 +56,8 @@ Den internen Namen zur Seriennummer liefert nur `find_burner(<serial>)` (`text`)
 
 Lies ihn nach **`cor-metis:burner-status`**. Für die Diagnose zählen drei Dinge:
 
-- **`cluster`**: in diesem Environment liegt die Cloud-Gegenseite (Schritt 4).
+- **`cluster`**: in diesem Environment liegt die Cloud-Gegenseite (Schritt 4). Ohne ESKS verrät ihn der
+  Namespace des Pods `softwareupdateservice-…` aus Schritt 2 (`dev01`/`dev02`).
 - **`traffic_lights.issues`**: Die Pfade zeigen auf den Container, der zuerst gelesen wird (Tabelle unten).
 - **Indizien für ein Test- oder Hallengerät ohne Hardware**, einzeln schwach, zusammen stark: Ist
   `DETACHED` oder `UNKNOWN`, kein Temperaturfühler gültig, alle Leistungen 0, ein Container
@@ -105,7 +107,32 @@ Release-Stände gleichzeitig fahren. Für „welche Software läuft?“ je Diens
 | Softwareupdate, Versionen, Firmware | Pod `softwareupdateservice-…` (Namespace = Cluster, `dev01`/`dev02`) |
 | Service-Passthrough, Fernzugriff auf die HMI | Pod `http-forwarder-daemonset-…` (Namespace `remote`) |
 | Updates kommen gar nicht an, Rollout hängt | Pods in `cattle-*` und `fleet-*` (Rancher/Fleet) |
-<!-- E2E cor-x00012: Pod-Namen und Namespaces gegen das echte Gerät prüfen, Beispiel-Zeilen ergänzen. -->
+So sah es auf `cor-x00012` (dev02) am 2026-11-13 aus, Pod-Namen mit wechselndem Suffix:
+
+| Namespace | Pods |
+|---|---|
+| `dev02` (Cluster) | `softwareupdateservice-mthdp` (BSUS) |
+| `remote` | `http-forwarder-daemonset-r55rc`, `noderoot-qb44m` |
+| `cattle-fleet-system` | `fleet-agent-…` |
+| `cattle-system` | `cattle-cluster-agent-…`, `rancher-webhook-…` |
+| `kube-system` | `coredns-…`, `local-path-provisioner-…` |
+
+Enden **alle** Pods zur selben Sekunde (`last_finished_at`) mit `last_exit_code` 255 bzw. `last_reason`
+`Unknown`, und die Docker-Container (`finished_at`) kurz davor, innerhalb etwa einer Minute (erst
+Docker, dann k3s), spricht das für einen **Neustart des Geräts**, nicht für einen Absturz der Pods.
+Das ist ein Schluss, kein Beleg: Kein Tool liefert Uptime oder Boot-Zeitpunkt. Deshalb als
+„wahrscheinlich ein Neustart des Geräts“ melden. Hohe `restart_count`s bei `cattle-*` (dort 14–27) sammeln sich so über Wochen an.
+
+**BSUS-Entscheidungen lesen.** Der BSUS schreibt pro Zyklus eine Entscheidungszeile je Bereich,
+bei jeder Änderung und sonst einmal pro Stunde (`filter` = `→`, `tail_lines` klein halten):
+`software: installed …, offered … → up_to_date|…`, `tools: …`, `firmware: requested …, offered …,
+resolved … → …`, `nginx: …/… checks passed → ok|not_configured`. `(unchanged, N× since 15:25 UTC)`
+nennt nur die Uhrzeit, den Tag liefert `started_at` des Pods. Für „läuft das Update sauber?“ zählt
+die `software`-Zeile; `firmware … no_products_offered` heißt nur, dass die Cloud keine Firmware für
+das Gerät anbietet. `nginx: 0/0 … → not_configured` seit einem Neustart ist ein bekannter Befund
+(Stand 2026-11-13): Beim Pod-Start fehlt `/srv/burner/nginxcheck.yaml` (`doesn't exist. No NGINX checks
+will be performed!`), erst das nächste Softwareupdate lädt die Checks wieder. Der NGINX-Wächter ist
+bis dahin aus; melden, aber nicht als Ursache eines anderen Symptoms.
 
 Pod-Logs liest `get_device_pod_logs(serial, namespace, pod, container?, previous?, tail_lines?,
 since_seconds?, until?, filter?)`. Namespace und Pod-Name **nur aus `pods`** übernehmen, nie raten
@@ -116,6 +143,8 @@ Logdatei des Containers, ältere rotierte nicht.
 - **Höchstens drei Geräte-Abrufe gleichzeitig** pro Aufrufer, sonst `too_many_pending_operations`.
   Lieber nacheinander.
 - `tail_lines` bis 1000. Je nach Dienst sind das 30 Minuten (`llhc`, `hlhc`) oder ein Tag (`bcis`).
+  Klein anfangen (200) und eng filtern: JSON-Zeilen mit Stacktraces sind lang, 1000 Zeilen mit
+  breitem Filter sprengen schnell den Kontext (BSUS: über 100 KB).
   Der `filter` wirkt nur auf die gelesenen Zeilen und sucht nicht weiter zurück, dafür gibt es
   `until` (unten).
 - **„Seit wann?“** Erst nach einer Meldung suchen, die die Dauer selbst nennt (`filter` auf
@@ -125,8 +154,9 @@ Logdatei des Containers, ältere rotierte nicht.
   in den nächsten Aufruf geben (sonst nichts ändern), und du bekommst die `tail_lines` Zeilen davor,
   ohne Lücke und ohne Doppel. `until` ist exklusiv. Grenze ist die Log-Rotation am Gerät, nicht
   CGSS. `next_until: null` heißt: nichts mehr gelesen, Anfang erreicht. Den Wert nie selbst
-  umrechnen oder kürzen; bei Pods trägt er oft einen Offset (`+02:00`), das ist richtig so.
-  <!-- E2E cor-x00012: Offset der Pod-Zeitstempel bestätigen (UTC oder Europe/Vienna). -->
+  umrechnen oder kürzen; bei Pods trägt er die Ortszeit des Geräts (`+01:00` im Winter, `+02:00` im
+  Sommer), während die Zeilen selbst in UTC (`Z`) stehen. Beides ist derselbe Zeitpunkt, das ist
+  richtig so (am echten Gerät geprüft).
 - `{state: "pending"}` → **mit denselben Argumenten** erneut aufrufen, bis das Ergebnis kommt (höchstens 5 min).
 - `redactions` > 0 heißt, CGSS hat Query-Strings, IPs oder Secrets geschwärzt (`?[redacted]`,
   `[ip-1]`). Nicht nach dem Original fragen.
@@ -147,13 +177,17 @@ Der Grund steht fast immer in den **letzten Zeilen vor dem Neustart**, nicht in 
 - Exit 0 nach einem Neustart ist ein **gewollter** Neustart des Dienstes, kein Absturz; dann zählt die
   Begründung im Log.
 
-<!-- E2E cor-x00012: BCIS-Neustartgrund (274 Neustarts) als echtes Beispiel einsetzen. -->
+Echtes Beispiel (`cor-x00012`, BSUS-Pod, `previous = true`): Die letzten Zeilen der alten Instanz
+sind um 15:24:06 UTC `redis connection failed on [ip-1]:6379: UnableToConnect`, `last_exit_code` 255,
+und alle anderen Pods und Container enden im selben Moment. Das ist kein Redis-Fehler, sondern der
+Geräte-Neustart, bei dem Redis kurz vor dem BSUS wegfiel. Ursache also: Reboot, Befund „läuft seither
+stabil“.
 
 **Rauschen, nicht Ursache:** `new simple token` als Warning alle ~5 min (normaler Token-Refresh);
 `updated_secret` → `429 too early` (kein neues Secret da); das 424 der Wettervorhersage, solange es
 nicht um Wetter geht; `No NetworkManager device found for
 interface 'wlp…'` und `Disk size file not found` (SMS); Redis' Warnung „does not require
-authentication“.
+authentication“; im BSUS-Pod alle 15 min `exception performing tools update … /var/run/tools-installer.sock` (bekannt: der Tools-Installer ist unter k3s nicht erreichbar), solange es nicht um die Tools geht.
 
 ## Schritt 4 — Cloud-Gegenseite: Argo-Tools
 
