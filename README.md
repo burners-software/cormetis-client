@@ -32,7 +32,7 @@ plugins/
 │       ├── deployment-status/      Was läuft wo, in welcher Version (read-only über CGSS)
 │       ├── deploy-and-wait/        Auf einen GitOps-Commit warten, bis er ausgerollt ist
 │       ├── diagnose/               Warum eine Application degraded ist oder neu startet
-│       └── device-diagnose/        Am Gerät selbst: Container, Logs, Cloud-Gegenseite
+│       └── device-diagnose/        Am Gerät selbst: Container, Pods, Logs, Cloud-Gegenseite
 └── cor-metis-code/                 Nur Claude Code, keine Skills
     ├── .claude-plugin/plugin.json  userConfig: der persönliche Key
     ├── .mcp.json                   Server ESKS und CGSS, Key als Bearer-Header
